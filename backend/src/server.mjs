@@ -30,6 +30,10 @@ const server = createServer(async (request, response) => {
   }
 
   try {
+    if ((request.method === "GET" || request.method === "HEAD") && url.pathname === "/map") {
+      return sendRedirect(response, `/map/${url.search}`, request.method === "HEAD");
+    }
+
     if ((request.method === "GET" || request.method === "HEAD") && (url.pathname === "/map" || url.pathname.startsWith("/map/"))) {
       return sendMapAsset(url.pathname, response, request.method === "HEAD");
     }
@@ -180,6 +184,12 @@ function sendJson(response, statusCode, payload) {
 function sendEmpty(response, statusCode) {
   applyHeaders(response, statusCode);
   response.end();
+}
+
+function sendRedirect(response, location, headOnly = false) {
+  applyHeaders(response, 308, "text/plain; charset=utf-8");
+  response.setHeader("Location", location);
+  response.end(headOnly ? undefined : `Redirecting to ${location}`);
 }
 
 function applyHeaders(response, statusCode, contentType) {

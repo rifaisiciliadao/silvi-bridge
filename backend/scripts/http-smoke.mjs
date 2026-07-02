@@ -246,6 +246,10 @@ try {
   const mapHtml = await readText(`http://127.0.0.1:${bridgePort}/map/`);
   assert.match(mapHtml, /Silvi Live Project Map/);
 
+  const mapRedirect = await readResponse(`http://127.0.0.1:${bridgePort}/map?project=29`, { redirect: "manual" });
+  assert.equal(mapRedirect.status, 308);
+  assert.equal(mapRedirect.headers.get("location"), "/map/?project=29");
+
   const iframeHtml = await readText(`http://127.0.0.1:${bridgePort}/map/iframe.html`);
   assert.match(iframeHtml, /id="silvi-map-frame"/);
   assert.match(iframeHtml, /window\.location\.search/);
@@ -293,6 +297,10 @@ async function readText(url) {
   const response = await fetch(url);
   assert.equal(response.ok, true);
   return response.text();
+}
+
+async function readResponse(url, init) {
+  return fetch(url, init);
 }
 
 function delay(ms) {

@@ -79,6 +79,7 @@ GeoJSON endpoints:
 Static embed endpoints:
 
 - `GET /map/`
+- `GET /map` redirects to `/map/` while preserving the query string.
 - `GET /map/iframe.html`
 - `GET /map/styles.css`
 - `GET /map/map.js`
