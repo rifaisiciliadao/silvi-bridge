@@ -122,6 +122,30 @@ Iframe host:
 - Forwards its query string to the inner `/map/` page, so
   `/map/iframe.html?project=29` opens `/map/?project=29` inside the iframe.
 
+## DigitalOcean Deployment
+
+Production proof-of-concept deployment is on DigitalOcean App Platform in the
+`turinglabs` account context.
+
+DigitalOcean project:
+
+- Name: `Rifai`
+- ID: `bc81f31e-e85d-4867-8baf-9b26f2410d69`
+
+App Platform app:
+
+- Name: `silvi-bridge`
+- ID: `712b090e-efba-42dd-a723-6dd7e2ddef21`
+- Region: `fra`
+- Service: single `backend` web service serving both API and `/map/` assets.
+- Size: `apps-s-1vcpu-0.5gb`, `instance_count: 1`.
+- Public domain: `https://silvi.rifaisicilia.com`
+- Default ingress: `https://silvi-bridge-prtzo.ondigitalocean.app`
+
+The custom domain is managed in DigitalOcean DNS under `rifaisicilia.com` with a
+`silvi` CNAME to the App Platform ingress. Do not commit or print deployed
+secret values; `SILVI_API_KEY` is configured as a DigitalOcean secret env var.
+
 ## Test Commands
 
 Run from repository root:
