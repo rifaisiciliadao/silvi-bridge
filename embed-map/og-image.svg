@@ -10,6 +10,10 @@
       <stop offset="0" stop-color="#bfe8ee"/>
       <stop offset="1" stop-color="#8fcbd8"/>
     </linearGradient>
+    <linearGradient id="labelIcon" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1aa66a"/>
+      <stop offset="1" stop-color="#076c3c"/>
+    </linearGradient>
     <pattern id="fieldDots" width="18" height="18" patternUnits="userSpaceOnUse">
       <circle cx="4" cy="4" r="1.1" fill="#0f8a4b" opacity="0.32"/>
       <circle cx="13" cy="12" r="1" fill="#0f8a4b" opacity="0.18"/>
@@ -37,7 +41,11 @@
     <path d="M214 188L338 238L298 374L172 332Z" fill="#eaf4dc" stroke="#d7e8cc" stroke-width="4"/>
     <path d="M-52 326L88 362L44 502L-82 458Z" fill="#eaf4dc" stroke="#d7e8cc" stroke-width="4"/>
     <path d="M116 430L226 470L188 578L76 545Z" fill="#eaf4dc" stroke="#d7e8cc" stroke-width="4"/>
+    <path d="M74 112C126 154 174 166 226 150" fill="none" stroke="#0f8a4b" stroke-width="3" stroke-linecap="round" opacity="0.28"/>
+    <path d="M10 405C66 420 106 448 139 497" fill="none" stroke="#0f8a4b" stroke-width="3" stroke-linecap="round" opacity="0.24"/>
+    <path d="M244 244C284 264 312 304 324 356" fill="none" stroke="#0f8a4b" stroke-width="3" stroke-linecap="round" opacity="0.24"/>
     <path d="M148 340L224 372L200 448L120 420Z" fill="none" stroke="#0a72ef" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M156 352L211 376L194 433L134 413Z" fill="#0a72ef" opacity="0.10"/>
     <circle cx="168" cy="394" r="13" fill="#171717" stroke="#ffffff" stroke-width="5" filter="url(#pinShadow)"/>
     <circle cx="192" cy="374" r="10" fill="#0f8a4b" stroke="#ffffff" stroke-width="5" filter="url(#pinShadow)"/>
   </g>
@@ -47,12 +55,12 @@
     <rect x="0.5" y="0.5" width="509" height="489" rx="7.5" fill="none" stroke="#000000" opacity="0.08"/>
   </g>
 
-  <g transform="translate(104 106)" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+  <g transform="translate(104 106)" font-family="Geist, Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
     <text x="0" y="0" dominant-baseline="hanging" font-size="16" font-weight="800" fill="#666666" text-transform="uppercase">Silvi Protocol</text>
     <text x="0" y="44" dominant-baseline="hanging" font-size="56" line-height="1" font-weight="800" fill="#171717">Rifai Sicilia</text>
     <text x="0" y="104" dominant-baseline="hanging" font-size="56" line-height="1" font-weight="800" fill="#171717">DAO</text>
-    <text x="0" y="186" font-size="23" font-weight="500" fill="#4d4d4d">Verified project geography, tree records,</text>
-    <text x="0" y="218" font-size="23" font-weight="500" fill="#4d4d4d">planting claims, and field evidence.</text>
+    <text x="0" y="186" font-size="23" font-weight="500" fill="#4d4d4d">Live Silvi Protocol map for verified</text>
+    <text x="0" y="218" font-size="23" font-weight="500" fill="#4d4d4d">geography and field evidence.</text>
 
     <g transform="translate(0 274)">
       <rect width="132" height="88" rx="8" fill="#ffffff" stroke="#000000" stroke-opacity="0.10"/>
@@ -62,12 +70,12 @@
     <g transform="translate(148 274)">
       <rect width="132" height="88" rx="8" fill="#ffffff" stroke="#000000" stroke-opacity="0.10"/>
       <text x="18" y="21" font-size="14" font-weight="800" fill="#808080">TREES</text>
-      <text x="18" y="62" font-size="30" font-weight="800" fill="#171717">Records</text>
+      <text x="18" y="62" font-size="28" font-weight="800" fill="#171717">Records</text>
     </g>
     <g transform="translate(296 274)">
       <rect width="164" height="88" rx="8" fill="#ffffff" stroke="#000000" stroke-opacity="0.10"/>
       <text x="18" y="21" font-size="14" font-weight="800" fill="#808080">CLAIMS</text>
-      <text x="18" y="62" font-size="30" font-weight="800" fill="#171717">Evidence</text>
+      <text x="18" y="62" font-size="28" font-weight="800" fill="#171717">Evidence</text>
     </g>
 
     <g transform="translate(0 404)">
@@ -82,10 +90,12 @@
     </g>
   </g>
 
-  <g transform="translate(732 436)" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
-    <rect width="330" height="86" rx="8" fill="#ffffff" opacity="0.94" filter="url(#cardShadow)"/>
-    <circle cx="36" cy="43" r="12" fill="#0f8a4b" stroke="#dff3e8" stroke-width="8"/>
-    <text x="66" y="36" font-size="20" font-weight="800" fill="#171717">Oasi Maker</text>
-    <text x="66" y="62" font-size="16" font-weight="600" fill="#666666">1 zone · 2 trees · Proof of Planting</text>
+  <g transform="translate(718 408)" font-family="Geist, Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    <rect width="386" height="108" rx="8" fill="#ffffff" opacity="0.95" filter="url(#cardShadow)"/>
+    <rect x="22" y="22" width="64" height="64" rx="8" fill="url(#labelIcon)"/>
+    <path d="M54 38C41 39 35 48 36 60C48 62 59 57 62 44C56 47 50 52 45 59C46 51 49 44 54 38Z" fill="#ffffff"/>
+    <text x="106" y="41" font-size="22" font-weight="800" fill="#171717">Sharewood Forest</text>
+    <text x="106" y="69" font-size="16" font-weight="600" fill="#4d4d4d">Verified geography and field evidence</text>
+    <text x="106" y="91" font-size="14" font-weight="700" fill="#0f8a4b">Live Silvi project map</text>
   </g>
 </svg>
