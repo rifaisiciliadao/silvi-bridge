@@ -1,0 +1,17 @@
+{
+  "name": "backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Rifai Sicilia DAO backend bridge for the Silvi public API.",
+  "scripts": {
+    "start": "node src/server.mjs",
+    "check": "node --check src/config.mjs && node --check src/silvi-client.mjs && node --check src/server.mjs && node --check scripts/smoke.mjs && node --check scripts/http-smoke.mjs",
+    "smoke": "node scripts/smoke.mjs",
+    "http-smoke": "node scripts/http-smoke.mjs",
+    "test": "npm run check && npm run smoke && npm run http-smoke"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

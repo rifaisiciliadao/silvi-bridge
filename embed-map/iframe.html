@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Silvi Map Iframe Host</title>
+    <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: #fafafa;
+      }
+
+      iframe {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        border: 0;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <iframe
+      id="silvi-map-frame"
+      src="/map/"
+      title="Silvi live project map"
+      loading="eager"
+    ></iframe>
+    <script>
+      const frame = document.getElementById("silvi-map-frame");
+      const mapUrl = new URL("/map/", window.location.origin);
+      mapUrl.search = window.location.search;
+      frame.src = `${mapUrl.pathname}${mapUrl.search}`;
+    </script>
+  </body>
+</html>

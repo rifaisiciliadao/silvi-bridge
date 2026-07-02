@@ -1,0 +1,17 @@
+{
+  "name": "silvi-bridge",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Rifai Sicilia DAO Silvi Protocol bridge and embeddable live map.",
+  "scripts": {
+    "start": "npm --prefix backend start",
+    "check": "npm --prefix backend run check",
+    "smoke": "npm --prefix backend run smoke",
+    "http-smoke": "npm --prefix backend run http-smoke",
+    "test": "npm --prefix backend test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

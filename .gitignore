@@ -1,0 +1,12 @@
+.DS_Store
+.env
+.env.local
+.env.*.local
+backend/.env
+backend/.env.local
+embed-map/.env
+embed-map/.env.local
+node_modules/
+coverage/
+dist/
+.vite/

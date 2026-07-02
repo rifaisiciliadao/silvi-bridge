@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Silvi Live Project Map</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@700&family=Crimson+Text:ital@0;1&family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="map-shell" aria-label="Silvi live project map">
+      <div id="map" class="map-canvas" aria-label="Project geography"></div>
+      <div id="mapLoader" class="map-loader" role="status" aria-live="polite">
+        <div class="map-loader-card">
+          <span class="map-loader-spinner" aria-hidden="true"></span>
+          <span id="mapLoaderText">Loading map...</span>
+        </div>
+      </div>
+
+      <section class="status-panel" aria-live="polite">
+        <header class="panel-header">
+          <div>
+            <p class="eyebrow">Silvi Protocol</p>
+            <h1>Rifai Sicilia DAO</h1>
+          </div>
+          <span id="sourceBadge" class="source-badge">staging</span>
+        </header>
+
+        <p id="statusText" class="status-text">Loading Silvi project geography...</p>
+
+        <dl class="stats-grid" aria-label="Silvi map statistics">
+          <div class="stat-projects">
+            <dt>Projects</dt>
+            <dd id="projectCount">-</dd>
+          </div>
+          <div class="stat-zones">
+            <dt>Zones</dt>
+            <dd id="zoneCount">-</dd>
+          </div>
+          <div>
+            <dt>Trees</dt>
+            <dd id="treeCount">-</dd>
+          </div>
+          <div class="stat-features">
+            <dt>Features</dt>
+            <dd id="featureCount">-</dd>
+          </div>
+        </dl>
+
+        <div class="panel-actions">
+          <button id="fitButton" type="button">Fit map</button>
+          <a id="apiLink" href="/api/silvi/map.geojson" target="_blank" rel="noreferrer">GeoJSON</a>
+        </div>
+
+        <div id="projectList" class="project-list" aria-label="Silvi projects"></div>
+      </section>
+
+      <aside id="detailPanel" class="detail-panel" aria-label="Selected Silvi feature" hidden>
+        <header class="detail-header">
+          <div>
+            <p id="detailKind" class="eyebrow">Feature</p>
+            <h2 id="detailTitle">Selected feature</h2>
+            <p id="detailSubtitle" class="detail-subtitle"></p>
+          </div>
+          <div class="detail-header-actions">
+            <button id="detailRawButton" class="detail-header-button" type="button" aria-expanded="false">Raw</button>
+            <button id="detailCloseButton" class="detail-header-button" type="button" aria-label="Close details">Close</button>
+          </div>
+        </header>
+
+        <section id="claimSection" class="detail-section">
+          <h3>Claim</h3>
+          <dl id="claimList" class="detail-list"></dl>
+        </section>
+
+        <section class="detail-section">
+          <h3 id="detailFactsTitle">Details</h3>
+          <dl id="detailFacts" class="detail-list"></dl>
+        </section>
+
+        <section id="mediaSection" class="detail-section">
+          <h3>Photos</h3>
+          <div id="mediaGrid" class="media-grid"></div>
+        </section>
+
+        <section id="rawSection" class="detail-section" hidden>
+          <h3>Raw</h3>
+          <pre id="detailRaw" class="detail-raw"></pre>
+        </section>
+      </aside>
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script type="module" src="./map.js"></script>
+  </body>
+</html>
