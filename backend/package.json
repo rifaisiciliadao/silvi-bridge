@@ -4,6 +4,11 @@
   "private": true,
   "type": "module",
   "description": "Rifai Sicilia DAO backend bridge for the Silvi public API.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rifaisiciliadao/silvi-bridge.git",
+    "directory": "backend"
+  },
   "scripts": {
     "start": "node src/server.mjs",
     "check": "node --check src/config.mjs && node --check src/silvi-client.mjs && node --check src/server.mjs && node --check scripts/smoke.mjs && node --check scripts/http-smoke.mjs",

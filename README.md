@@ -1,7 +1,9 @@
 # Silvi Bridge
 
-Public proof of concept for rendering Rifai Sicilia DAO project data from the
-Silvi Protocol public API.
+[![CI](https://github.com/rifaisiciliadao/silvi-bridge/actions/workflows/ci.yml/badge.svg)](https://github.com/rifaisiciliadao/silvi-bridge/actions/workflows/ci.yml)
+
+Public reference implementation for rendering Rifai Sicilia DAO project data
+from the Silvi Protocol public API.
 
 The repository is intentionally split into two small, isolated parts:
 
@@ -15,7 +17,7 @@ The repository is intentionally split into two small, isolated parts:
 This repository is public. Never commit real Silvi API keys, production tokens,
 private RPC URLs, local `.env` files, raw customer exports, or any other secret.
 
-## Current Capabilities
+## Capabilities
 
 - Reads the Silvi staging public API with query-parameter authentication.
 - Proxies project list, project detail, GIS, zones, trees, logs, images,
@@ -253,6 +255,12 @@ npm --prefix backend run http-smoke
 
 The test suite uses mock HTTP servers and does not need the real Silvi API key.
 
+## Status
+
+This repository is a public integration PoC. It is designed to be easy to audit,
+run locally, and embed in another application while the production deployment
+shape is finalized.
+
 ## Deployment Notes
 
 - Deploy `backend/` as the HTTP service.
@@ -275,6 +283,8 @@ The test suite uses mock HTTP servers and does not need the real Silvi API key.
   data.
 - Keep browser-facing URLs free of API keys. The backend is the only component
   that talks to authenticated Silvi endpoints.
+
+For vulnerability or secret-exposure reports, follow `SECURITY.md`.
 
 ## Troubleshooting
 

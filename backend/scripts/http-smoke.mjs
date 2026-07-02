@@ -74,7 +74,7 @@ const mockStacClaims = [
       timestamp: "2026-07-01T08:40:00.000Z",
       notes: "HTTP smoke claim",
       goal: "Mediterranean Coast",
-      creator: "GrowFi",
+      creator: "Rifai Sicilia DAO",
       tree: {
         id: "tree-http-smoke",
         title: "Holm oak tree"

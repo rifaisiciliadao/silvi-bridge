@@ -3,7 +3,7 @@
 ## Project Scope
 
 This repository is the public Rifai Sicilia DAO Silvi integration proof of
-concept. It is intentionally separate from GrowFi.
+concept. It is intentionally self-contained.
 
 Top-level structure:
 
@@ -11,7 +11,7 @@ Top-level structure:
 - `embed-map/`: static Leaflet/OpenStreetMap embed client served by the backend
   at `/map/`.
 
-Do not move this code back into the GrowFi repository unless explicitly
+Do not merge this code into another application repository unless explicitly
 requested.
 
 ## Public Repository Rules
@@ -140,6 +140,19 @@ npm --prefix backend run http-smoke
 
 The tests use local mock upstream servers and do not need the real Silvi API
 key.
+
+CI runs the same root `npm test` command via GitHub Actions:
+
+- `.github/workflows/ci.yml`
+
+## Security Reporting
+
+Security guidance lives in:
+
+- `SECURITY.md`
+
+Do not open public issues for suspected secrets, API-key exposure, private data,
+or vulnerabilities that could affect deployed infrastructure.
 
 ## Before Pushing
 

@@ -4,6 +4,17 @@
   "private": true,
   "type": "module",
   "description": "Rifai Sicilia DAO Silvi Protocol bridge and embeddable live map.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rifaisiciliadao/silvi-bridge.git"
+  },
+  "keywords": [
+    "silvi",
+    "rifai-sicilia",
+    "geojson",
+    "leaflet",
+    "dmrv"
+  ],
   "scripts": {
     "start": "npm --prefix backend start",
     "check": "npm --prefix backend run check",
