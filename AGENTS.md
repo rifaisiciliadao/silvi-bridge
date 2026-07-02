@@ -49,9 +49,9 @@ with `../../embed-map/`.
 
 ## Public Endpoints
 
-Health and discovery:
+Health and entrypoint:
 
-- `GET /`
+- `GET /` redirects to `/map/`.
 - `GET /health`
 
 Silvi proxy endpoints:
@@ -80,9 +80,22 @@ Static embed endpoints:
 
 - `GET /map/`
 - `GET /map` redirects to `/map/` while preserving the query string.
+- `GET /map/og-image.png`
+- `GET /map/og-image.svg`
+- `GET /map/favicon.svg`
+- `GET /map/favicon-32.png`
+- `GET /map/apple-touch-icon.png`
+- `GET /map/icon-512.png`
 - `GET /map/iframe.html`
 - `GET /map/styles.css`
 - `GET /map/map.js`
+
+Social preview metadata for `/map/` and `/map/iframe.html` uses:
+
+- Title: `Rifai Sicilia DAO | Live Silvi Project Map`
+- Description: `Explore verified Silvi Protocol project geography, tree
+  records, planting claims, and field evidence from Rifai Sicilia DAO.`
+- OpenGraph image: `/map/og-image.png`
 
 ## GeoJSON Schema
 

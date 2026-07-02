@@ -19,7 +19,9 @@ const mapDirectory = fileURLToPath(new URL("../../embed-map/", import.meta.url))
 const mapContentTypes = {
   ".css": "text/css; charset=utf-8",
   ".html": "text/html; charset=utf-8",
-  ".js": "text/javascript; charset=utf-8"
+  ".js": "text/javascript; charset=utf-8",
+  ".png": "image/png",
+  ".svg": "image/svg+xml; charset=utf-8"
 };
 
 const server = createServer(async (request, response) => {
@@ -30,35 +32,16 @@ const server = createServer(async (request, response) => {
   }
 
   try {
+    if ((request.method === "GET" || request.method === "HEAD") && url.pathname === "/") {
+      return sendRedirect(response, "/map/", request.method === "HEAD");
+    }
+
     if ((request.method === "GET" || request.method === "HEAD") && url.pathname === "/map") {
       return sendRedirect(response, `/map/${url.search}`, request.method === "HEAD");
     }
 
     if ((request.method === "GET" || request.method === "HEAD") && (url.pathname === "/map" || url.pathname.startsWith("/map/"))) {
       return sendMapAsset(url.pathname, response, request.method === "HEAD");
-    }
-
-    if (url.pathname === "/" && request.method === "GET") {
-      return sendJson(response, 200, {
-        name: "silvi-bridge",
-        endpoints: [
-          "/map/",
-          "/health",
-          "/api/silvi/root",
-          "/api/silvi/projects",
-          "/api/silvi/projects.geojson",
-          "/api/silvi/gis",
-          "/api/silvi/map.geojson",
-          "/api/silvi/projects/:projectId",
-          "/api/silvi/projects/:projectId/gis",
-          "/api/silvi/projects/:projectId/logs",
-          "/api/silvi/projects/:projectId/map.geojson",
-          "/api/silvi/projects/:projectId/trees",
-          "/api/silvi/projects/:projectId/zones",
-          "/api/silvi/projects/:projectId/zones.geojson",
-          "/api/silvi/projects/:projectId/stac"
-        ]
-      });
     }
 
     if (url.pathname === "/health" && request.method === "GET") {
@@ -150,7 +133,19 @@ server.listen(config.port, () => {
 async function sendMapAsset(pathname, response, headOnly = false) {
   const relativePath = pathname === "/map" || pathname === "/map/" ? "index.html" : pathname.replace(/^\/map\//, "");
   const safePath = normalize(relativePath).replace(/^(\.\.(\/|\\|$))+/, "");
-  const allowed = new Set(["index.html", "iframe.html", "styles.css", "map.js", "SilviMapFrame.tsx"]);
+  const allowed = new Set([
+    "apple-touch-icon.png",
+    "favicon-32.png",
+    "favicon.svg",
+    "iframe.html",
+    "icon-512.png",
+    "index.html",
+    "map.js",
+    "og-image.png",
+    "og-image.svg",
+    "SilviMapFrame.tsx",
+    "styles.css"
+  ]);
   const filename = basename(safePath);
 
   if (!allowed.has(filename)) {

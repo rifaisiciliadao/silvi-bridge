@@ -198,6 +198,10 @@ try {
   const health = await readJson(`http://127.0.0.1:${bridgePort}/health`);
   assert.equal(health.ok, true);
 
+  const rootRedirect = await readResponse(`http://127.0.0.1:${bridgePort}/`, { redirect: "manual" });
+  assert.equal(rootRedirect.status, 308);
+  assert.equal(rootRedirect.headers.get("location"), "/map/");
+
   const projects = await readJson(`http://127.0.0.1:${bridgePort}/api/silvi/projects`);
   assert.equal(projects.count, 1);
   assert.equal(projects.mappedCount, 1);
@@ -244,14 +248,32 @@ try {
   assert.equal(zonesGeojson.features[0].properties.projectId, 29);
 
   const mapHtml = await readText(`http://127.0.0.1:${bridgePort}/map/`);
-  assert.match(mapHtml, /Silvi Live Project Map/);
+  assert.match(mapHtml, /Rifai Sicilia DAO \| Live Silvi Project Map/);
+  assert.match(mapHtml, /Explore verified Silvi Protocol project geography/);
+  assert.match(mapHtml, /property="og:image" content="https:\/\/silvi\.rifaisicilia\.com\/map\/og-image\.png"/);
+  assert.match(mapHtml, /name="twitter:card" content="summary_large_image"/);
+  assert.match(mapHtml, /href="\/map\/favicon\.svg" type="image\/svg\+xml"/);
 
   const mapRedirect = await readResponse(`http://127.0.0.1:${bridgePort}/map?project=29`, { redirect: "manual" });
   assert.equal(mapRedirect.status, 308);
   assert.equal(mapRedirect.headers.get("location"), "/map/?project=29");
 
+  const ogImage = await readResponse(`http://127.0.0.1:${bridgePort}/map/og-image.png`);
+  assert.equal(ogImage.ok, true);
+  assert.match(ogImage.headers.get("content-type"), /image\/png/);
+
+  const favicon = await readResponse(`http://127.0.0.1:${bridgePort}/map/favicon.svg`);
+  assert.equal(favicon.ok, true);
+  assert.match(favicon.headers.get("content-type"), /image\/svg\+xml/);
+
+  const faviconPng = await readResponse(`http://127.0.0.1:${bridgePort}/map/favicon-32.png`);
+  assert.equal(faviconPng.ok, true);
+  assert.match(faviconPng.headers.get("content-type"), /image\/png/);
+
   const iframeHtml = await readText(`http://127.0.0.1:${bridgePort}/map/iframe.html`);
   assert.match(iframeHtml, /id="silvi-map-frame"/);
+  assert.match(iframeHtml, /Rifai Sicilia DAO \| Silvi Map Embed/);
+  assert.match(iframeHtml, /property="og:image" content="https:\/\/silvi\.rifaisicilia\.com\/map\/og-image\.png"/);
   assert.match(iframeHtml, /window\.location\.search/);
   assert.match(iframeHtml, /width: 100vw/);
   assert.match(iframeHtml, /height: 100vh/);

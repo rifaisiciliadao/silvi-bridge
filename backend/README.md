@@ -31,8 +31,15 @@ http://localhost:4317
 
 ## Main Endpoints
 
+- `GET /` redirects to `/map/`
 - `GET /health`
 - `GET /map/`
+- `GET /map/og-image.png`
+- `GET /map/og-image.svg`
+- `GET /map/favicon.svg`
+- `GET /map/favicon-32.png`
+- `GET /map/apple-touch-icon.png`
+- `GET /map/icon-512.png`
 - `GET /map/iframe.html`
 - `GET /api/silvi/root`
 - `GET /api/silvi/gis`

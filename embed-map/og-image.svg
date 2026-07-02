@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Rifai Sicilia DAO live Silvi project map</title>
+  <desc id="desc">OpenGraph preview showing Rifai Sicilia DAO, verified Silvi Protocol geography, tree records, and planting claims.</desc>
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#f4f8f2"/>
+    </linearGradient>
+    <linearGradient id="sea" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#bfe8ee"/>
+      <stop offset="1" stop-color="#8fcbd8"/>
+    </linearGradient>
+    <pattern id="fieldDots" width="18" height="18" patternUnits="userSpaceOnUse">
+      <circle cx="4" cy="4" r="1.1" fill="#0f8a4b" opacity="0.32"/>
+      <circle cx="13" cy="12" r="1" fill="#0f8a4b" opacity="0.18"/>
+    </pattern>
+    <filter id="cardShadow" x="-20%" y="-20%" width="140%" height="150%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.08"/>
+      <feDropShadow dx="0" dy="20" stdDeviation="24" flood-color="#000000" flood-opacity="0.16"/>
+    </filter>
+    <filter id="pinShadow" x="-80%" y="-80%" width="260%" height="260%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#032516" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#paper)"/>
+
+  <g transform="translate(612 -72) rotate(7)">
+    <path d="M420 28C535 70 598 176 602 296C607 445 498 581 350 620C214 656 80 592 8 485C-67 375-53 225 35 126C128 21 290-19 420 28Z" fill="url(#sea)" opacity="0.92"/>
+    <path d="M-74 118C60 63 204 71 318 158C423 239 455 363 430 486C390 604 284 694 151 713C-12 736-156 650-221 520C-292 380-226 180-74 118Z" fill="#caeeb6"/>
+    <path d="M-92 150C54 94 194 113 299 197C390 270 412 380 383 488C343 587 250 656 135 674C-1 694-124 616-181 503C-242 379-218 211-92 150Z" fill="url(#fieldDots)" opacity="0.72"/>
+    <path d="M-171 486C-41 441 71 466 175 543C273 615 378 627 506 572" fill="none" stroke="#ffffff" stroke-width="20" stroke-linecap="round" opacity="0.86"/>
+    <path d="M-154 490C-26 449 76 475 171 546C270 619 373 629 490 580" fill="none" stroke="#d8d8d8" stroke-width="6" stroke-linecap="round"/>
+    <path d="M-88 170C-7 246 70 279 167 252C270 223 350 268 428 360" fill="none" stroke="#ffffff" stroke-width="18" stroke-linecap="round" opacity="0.84"/>
+    <path d="M-76 176C2 247 78 276 166 251C262 224 338 270 414 357" fill="none" stroke="#d8d8d8" stroke-width="6" stroke-linecap="round"/>
+    <path d="M56 77L188 136L146 264L4 238Z" fill="#eaf4dc" stroke="#d7e8cc" stroke-width="4"/>
+    <path d="M214 188L338 238L298 374L172 332Z" fill="#eaf4dc" stroke="#d7e8cc" stroke-width="4"/>
+    <path d="M-52 326L88 362L44 502L-82 458Z" fill="#eaf4dc" stroke="#d7e8cc" stroke-width="4"/>
+    <path d="M116 430L226 470L188 578L76 545Z" fill="#eaf4dc" stroke="#d7e8cc" stroke-width="4"/>
+    <path d="M148 340L224 372L200 448L120 420Z" fill="none" stroke="#0a72ef" stroke-width="5" stroke-linejoin="round"/>
+    <circle cx="168" cy="394" r="13" fill="#171717" stroke="#ffffff" stroke-width="5" filter="url(#pinShadow)"/>
+    <circle cx="192" cy="374" r="10" fill="#0f8a4b" stroke="#ffffff" stroke-width="5" filter="url(#pinShadow)"/>
+  </g>
+
+  <g transform="translate(72 70)" filter="url(#cardShadow)">
+    <rect width="510" height="490" rx="8" fill="#ffffff" opacity="0.96"/>
+    <rect x="0.5" y="0.5" width="509" height="489" rx="7.5" fill="none" stroke="#000000" opacity="0.08"/>
+  </g>
+
+  <g transform="translate(104 106)" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    <text x="0" y="0" dominant-baseline="hanging" font-size="16" font-weight="800" fill="#666666" text-transform="uppercase">Silvi Protocol</text>
+    <text x="0" y="44" dominant-baseline="hanging" font-size="56" line-height="1" font-weight="800" fill="#171717">Rifai Sicilia</text>
+    <text x="0" y="104" dominant-baseline="hanging" font-size="56" line-height="1" font-weight="800" fill="#171717">DAO</text>
+    <text x="0" y="186" font-size="23" font-weight="500" fill="#4d4d4d">Verified project geography, tree records,</text>
+    <text x="0" y="218" font-size="23" font-weight="500" fill="#4d4d4d">planting claims, and field evidence.</text>
+
+    <g transform="translate(0 274)">
+      <rect width="132" height="88" rx="8" fill="#ffffff" stroke="#000000" stroke-opacity="0.10"/>
+      <text x="18" y="21" font-size="14" font-weight="800" fill="#808080">PROJECTS</text>
+      <text x="18" y="64" font-size="34" font-weight="800" fill="#171717">3</text>
+    </g>
+    <g transform="translate(148 274)">
+      <rect width="132" height="88" rx="8" fill="#ffffff" stroke="#000000" stroke-opacity="0.10"/>
+      <text x="18" y="21" font-size="14" font-weight="800" fill="#808080">ZONES</text>
+      <text x="18" y="64" font-size="34" font-weight="800" fill="#171717">3</text>
+    </g>
+    <g transform="translate(296 274)">
+      <rect width="164" height="88" rx="8" fill="#ffffff" stroke="#000000" stroke-opacity="0.10"/>
+      <text x="18" y="21" font-size="14" font-weight="800" fill="#808080">TREES</text>
+      <text x="18" y="64" font-size="34" font-weight="800" fill="#171717">1176</text>
+    </g>
+
+    <g transform="translate(0 404)">
+      <rect width="214" height="42" rx="21" fill="#ebf5ff"/>
+      <circle cx="22" cy="21" r="7" fill="#0a72ef"/>
+      <text x="42" y="27" font-size="16" font-weight="800" fill="#0068d6">Live project map</text>
+    </g>
+    <g transform="translate(230 404)">
+      <rect width="212" height="42" rx="21" fill="#eaf8ef"/>
+      <circle cx="22" cy="21" r="7" fill="#0f8a4b"/>
+      <text x="42" y="27" font-size="16" font-weight="800" fill="#067647">Verified claims</text>
+    </g>
+  </g>
+
+  <g transform="translate(732 436)" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    <rect width="330" height="86" rx="8" fill="#ffffff" opacity="0.94" filter="url(#cardShadow)"/>
+    <circle cx="36" cy="43" r="12" fill="#0f8a4b" stroke="#dff3e8" stroke-width="8"/>
+    <text x="66" y="36" font-size="20" font-weight="800" fill="#171717">Oasi Maker</text>
+    <text x="66" y="62" font-size="16" font-weight="600" fill="#666666">1 zone · 2 trees · Proof of Planting</text>
+  </g>
+</svg>

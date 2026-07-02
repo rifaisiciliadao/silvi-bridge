@@ -25,10 +25,13 @@ private RPC URLs, local `.env` files, raw customer exports, or any other secret.
 - Builds map-ready GeoJSON for all projects at `/api/silvi/map.geojson`.
 - Builds project-scoped GeoJSON at
   `/api/silvi/projects/:projectId/map.geojson`.
+- Redirects `/` to `/map/` so the public domain opens the visual map and social
+  crawlers resolve the OpenGraph preview.
 - Serves a standalone live map at `/map/`.
 - Supports direct single-project map links such as `/map/?project=29`.
 - Supports an iframe host at `/map/iframe.html`, including query-string
   propagation to the inner map.
+- Serves OpenGraph and favicon assets for social previews and browser tabs.
 - Displays tree details, linked claim data, evidence photos, and raw debug data
   behind an explicit `Raw` button.
 - Uses OpenStreetMap tiles by default and supports custom Leaflet tile URLs.
@@ -127,9 +130,9 @@ backend appends this upstream and never writes the key into map URLs.
 
 ## Backend Endpoints
 
-Health and discovery:
+Health and entrypoint:
 
-- `GET /`
+- `GET /` redirects to `/map/`
 - `GET /health`
 
 Raw and normalized API proxy endpoints:
@@ -157,6 +160,12 @@ GeoJSON endpoints:
 Static map endpoints:
 
 - `GET /map/`
+- `GET /map/og-image.png`
+- `GET /map/og-image.svg`
+- `GET /map/favicon.svg`
+- `GET /map/favicon-32.png`
+- `GET /map/apple-touch-icon.png`
+- `GET /map/icon-512.png`
 - `GET /map/iframe.html`
 - `GET /map/styles.css`
 - `GET /map/map.js`
