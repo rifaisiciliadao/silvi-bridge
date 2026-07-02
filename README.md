@@ -58,7 +58,7 @@ private RPC URLs, local `.env` files, raw customer exports, or any other secret.
 
 ## Requirements
 
-- Node.js 20 or newer.
+- Node.js 22 LTS.
 - A Silvi public API key for real upstream data.
 
 No runtime npm dependencies are currently required.

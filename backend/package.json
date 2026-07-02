@@ -17,6 +17,6 @@
     "test": "npm run check && npm run smoke && npm run http-smoke"
   },
   "engines": {
-    "node": ">=20"
+    "node": "22.x"
   }
 }
