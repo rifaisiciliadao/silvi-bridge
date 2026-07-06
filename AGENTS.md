@@ -9,7 +9,9 @@ Top-level structure:
 
 - `backend/`: dependency-free Node.js ESM HTTP bridge for Silvi public API data.
 - `embed-map/`: static Leaflet/OpenStreetMap embed client served by the backend
-  at `/map/`.
+  at `/map/` for the Rifai Sicilia domain.
+- `growfi-map/`: duplicated static Leaflet/OpenStreetMap embed client served by
+  the backend at `/map/` when the request host is `silvi.growfi.dev`.
 
 Do not merge this code into another application repository unless explicitly
 requested.
@@ -42,10 +44,11 @@ query-parameter auth, so the bridge appends `?key=$SILVI_API_KEY` upstream.
 
 The backend serves static map assets from:
 
-- `../embed-map`
+- `../embed-map` by default and for `silvi.rifaisicilia.com`
+- `../growfi-map` when the request `Host` starts with `silvi.growfi.dev`
 
 This relative layout matters. `backend/src/server.mjs` resolves the map folder
-with `../../embed-map/`.
+with `../../embed-map/` and `../../growfi-map/`.
 
 ## Public Endpoints
 
@@ -92,10 +95,10 @@ Static embed endpoints:
 
 Social preview metadata for `/map/` and `/map/iframe.html` uses:
 
-- Title: `Rifai Sicilia DAO | Live Silvi Project Map`
-- Description: `Explore verified Silvi Protocol project geography, tree
-  records, planting claims, and field evidence from Rifai Sicilia DAO.`
-- OpenGraph image: `/map/og-image.png`
+- `silvi.rifaisicilia.com`: Rifai Sicilia DAO titles, descriptions, and
+  OpenGraph assets from `embed-map/`.
+- `silvi.growfi.dev`: GrowFi titles, descriptions, and OpenGraph assets from
+  `growfi-map/`.
 
 ## GeoJSON Schema
 
@@ -160,8 +163,9 @@ App Platform app:
 The custom domains are managed in DigitalOcean DNS with `silvi` CNAME records
 under `rifaisicilia.com` and `growfi.dev`, both pointing to the App Platform
 ingress. `silvi.rifaisicilia.com` remains the primary App Platform domain;
-`silvi.growfi.dev` is an alias that serves the same map and API. Do not commit
-or print deployed secret values; `SILVI_API_KEY` is configured as a
+`silvi.growfi.dev` is an alias for the same backend/API but serves the separate
+`growfi-map/` static app. Do not commit or print deployed secret values;
+`SILVI_API_KEY` is configured as a
 DigitalOcean secret env var.
 
 ## Test Commands

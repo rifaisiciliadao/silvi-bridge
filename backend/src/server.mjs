@@ -16,6 +16,7 @@ import {
 
 const config = getConfig();
 const mapDirectory = fileURLToPath(new URL("../../embed-map/", import.meta.url));
+const growfiMapDirectory = fileURLToPath(new URL("../../growfi-map/", import.meta.url));
 const mapContentTypes = {
   ".css": "text/css; charset=utf-8",
   ".html": "text/html; charset=utf-8",
@@ -41,7 +42,7 @@ const server = createServer(async (request, response) => {
     }
 
     if ((request.method === "GET" || request.method === "HEAD") && (url.pathname === "/map" || url.pathname.startsWith("/map/"))) {
-      return sendMapAsset(url.pathname, response, request.method === "HEAD");
+      return sendMapAsset(url.pathname, request, response, request.method === "HEAD");
     }
 
     if (url.pathname === "/health" && request.method === "GET") {
@@ -130,7 +131,7 @@ server.listen(config.port, () => {
   console.log(`silvi-bridge listening on http://localhost:${config.port}`);
 });
 
-async function sendMapAsset(pathname, response, headOnly = false) {
+async function sendMapAsset(pathname, request, response, headOnly = false) {
   const relativePath = pathname === "/map" || pathname === "/map/" ? "index.html" : pathname.replace(/^\/map\//, "");
   const safePath = normalize(relativePath).replace(/^(\.\.(\/|\\|$))+/, "");
   const allowed = new Set([
@@ -158,7 +159,7 @@ async function sendMapAsset(pathname, response, headOnly = false) {
   }
 
   try {
-    const asset = await readFile(join(mapDirectory, filename));
+    const asset = await readFile(join(mapAssetDirectory(request), filename));
     applyHeaders(response, 200, mapContentTypes[extname(filename)] || "application/octet-stream");
     response.end(headOnly ? undefined : asset);
   } catch {
@@ -169,6 +170,11 @@ async function sendMapAsset(pathname, response, headOnly = false) {
       }
     });
   }
+}
+
+function mapAssetDirectory(request) {
+  const host = String(request.headers["x-forwarded-host"] || request.headers.host || "").toLowerCase();
+  return host.startsWith("silvi.growfi.dev") ? growfiMapDirectory : mapDirectory;
 }
 
 function sendJson(response, statusCode, payload) {

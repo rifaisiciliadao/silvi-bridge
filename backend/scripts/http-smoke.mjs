@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
-import { createServer } from "node:http";
+import { createServer, request as httpRequest } from "node:http";
 
 const mockProjects = [
   {
@@ -254,6 +254,13 @@ try {
   assert.match(mapHtml, /name="twitter:card" content="summary_large_image"/);
   assert.match(mapHtml, /href="\/map\/favicon\.svg" type="image\/svg\+xml"/);
 
+  const growfiHost = "silvi.growfi.dev";
+  const growfiMapHtml = (await readWithHost({ port: bridgePort, path: "/map/", host: growfiHost })).text;
+  assert.match(growfiMapHtml, /GrowFi \| Silvi Protocol Project Map/);
+  assert.match(growfiMapHtml, /Explore Silvi Protocol geography, tree records, planting claims, and field evidence linked to a GrowFi campaign/);
+  assert.match(growfiMapHtml, /property="og:image" content="https:\/\/silvi\.growfi\.dev\/map\/og-image\.png"/);
+  assert.doesNotMatch(growfiMapHtml, /Rifai Sicilia DAO/);
+
   const mapRedirect = await readResponse(`http://127.0.0.1:${bridgePort}/map?project=29`, { redirect: "manual" });
   assert.equal(mapRedirect.status, 308);
   assert.equal(mapRedirect.headers.get("location"), "/map/?project=29");
@@ -262,9 +269,17 @@ try {
   assert.equal(ogImage.ok, true);
   assert.match(ogImage.headers.get("content-type"), /image\/png/);
 
+  const growfiOgImage = await readWithHost({ port: bridgePort, path: "/map/og-image.png", host: growfiHost });
+  assert.equal(growfiOgImage.statusCode, 200);
+  assert.match(growfiOgImage.headers["content-type"], /image\/png/);
+
   const favicon = await readResponse(`http://127.0.0.1:${bridgePort}/map/favicon.svg`);
   assert.equal(favicon.ok, true);
   assert.match(favicon.headers.get("content-type"), /image\/svg\+xml/);
+
+  const growfiFavicon = (await readWithHost({ port: bridgePort, path: "/map/favicon.svg", host: growfiHost })).text;
+  assert.match(growfiFavicon, /GrowFi Silvi Protocol/);
+  assert.doesNotMatch(growfiFavicon, /Rifai Sicilia DAO/);
 
   const faviconPng = await readResponse(`http://127.0.0.1:${bridgePort}/map/favicon-32.png`);
   assert.equal(faviconPng.ok, true);
@@ -277,6 +292,11 @@ try {
   assert.match(iframeHtml, /window\.location\.search/);
   assert.match(iframeHtml, /width: 100vw/);
   assert.match(iframeHtml, /height: 100vh/);
+
+  const growfiIframeHtml = (await readWithHost({ port: bridgePort, path: "/map/iframe.html", host: growfiHost })).text;
+  assert.match(growfiIframeHtml, /GrowFi \| Silvi Protocol Map Embed/);
+  assert.match(growfiIframeHtml, /property="og:image" content="https:\/\/silvi\.growfi\.dev\/map\/og-image\.png"/);
+  assert.doesNotMatch(growfiIframeHtml, /Rifai Sicilia DAO/);
 
   console.log("silvi-bridge http smoke ok");
 } finally {
@@ -309,20 +329,47 @@ async function waitForServer(port) {
   throw new Error("Bridge server did not start");
 }
 
-async function readJson(url) {
-  const response = await fetch(url);
+async function readJson(url, init) {
+  const response = await fetch(url, init);
   assert.equal(response.ok, true);
   return response.json();
 }
 
-async function readText(url) {
-  const response = await fetch(url);
+async function readText(url, init) {
+  const response = await fetch(url, init);
   assert.equal(response.ok, true);
   return response.text();
 }
 
 async function readResponse(url, init) {
   return fetch(url, init);
+}
+
+async function readWithHost({ port, path, host }) {
+  return new Promise((resolve, reject) => {
+    const request = httpRequest({
+      host: "127.0.0.1",
+      port,
+      path,
+      method: "GET",
+      headers: { host }
+    }, (response) => {
+      const chunks = [];
+      response.on("data", (chunk) => chunks.push(chunk));
+      response.on("end", () => {
+        const body = Buffer.concat(chunks);
+        resolve({
+          statusCode: response.statusCode,
+          headers: response.headers,
+          body,
+          text: body.toString("utf8")
+        });
+      });
+    });
+
+    request.on("error", reject);
+    request.end();
+  });
 }
 
 function delay(ms) {

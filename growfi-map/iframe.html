@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GrowFi | Silvi Protocol Map Embed</title>
+    <meta
+      name="description"
+      content="Embed a GrowFi Silvi Protocol project map with geography, tree records, and planting claims."
+    />
+    <link rel="canonical" href="https://silvi.growfi.dev/map/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="GrowFi" />
+    <meta property="og:title" content="GrowFi | Silvi Protocol Project Map" />
+    <meta
+      property="og:description"
+      content="Explore Silvi Protocol geography, tree records, planting claims, and field evidence linked to a GrowFi campaign."
+    />
+    <meta property="og:url" content="https://silvi.growfi.dev/map/" />
+    <meta property="og:image" content="https://silvi.growfi.dev/map/og-image.png" />
+    <meta property="og:image:secure_url" content="https://silvi.growfi.dev/map/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="GrowFi Silvi Protocol project map with tree and claim evidence." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="GrowFi | Silvi Protocol Project Map" />
+    <meta
+      name="twitter:description"
+      content="Explore Silvi Protocol geography, tree records, planting claims, and field evidence linked to a GrowFi campaign."
+    />
+    <meta name="twitter:image" content="https://silvi.growfi.dev/map/og-image.png" />
+    <meta name="theme-color" content="#0f8a4b" />
+    <link rel="icon" href="/map/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/map/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/map/apple-touch-icon.png" />
+    <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: #fafafa;
+      }
+
+      iframe {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        border: 0;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <iframe
+      id="silvi-map-frame"
+      title="Silvi live project map"
+      loading="eager"
+    ></iframe>
+    <script>
+      const frame = document.getElementById("silvi-map-frame");
+      const mapUrl = new URL("/map/", window.location.origin);
+      mapUrl.search = window.location.search;
+      frame.src = `${mapUrl.pathname}${mapUrl.search}`;
+    </script>
+  </body>
+</html>

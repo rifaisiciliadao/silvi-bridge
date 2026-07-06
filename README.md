@@ -11,8 +11,10 @@ The repository is intentionally split into two small, isolated parts:
   the server, reads Silvi project/zone/tree/STAC data, and returns normalized
   JSON and GeoJSON.
 - `embed-map/`: static Leaflet/OpenStreetMap client served by the backend at
-  `/map/`. It can be opened directly, embedded as an iframe, or wrapped with the
-  included React component.
+  `/map/` for the Rifai Sicilia domain. It can be opened directly, embedded as
+  an iframe, or wrapped with the included React component.
+- `growfi-map/`: duplicated static Leaflet/OpenStreetMap client served by the
+  backend at `/map/` when the request host is `silvi.growfi.dev`.
 
 This repository is public. Never commit real Silvi API keys, production tokens,
 private RPC URLs, local `.env` files, raw customer exports, or any other secret.
@@ -31,9 +33,9 @@ private RPC URLs, local `.env` files, raw customer exports, or any other secret.
 - Supports direct single-project map links such as `/map/?project=29`.
 - Supports an iframe host at `/map/iframe.html`, including query-string
   propagation to the inner map.
-- Serves the same bridge at `https://silvi.rifaisicilia.com` and
-  `https://silvi.growfi.dev`; the GrowFi domain is an App Platform alias of the
-  Rifai primary domain.
+- Serves the same bridge API at `https://silvi.rifaisicilia.com` and
+  `https://silvi.growfi.dev`, with host-specific static map apps and social
+  assets.
 - Serves OpenGraph and favicon assets for social previews and browser tabs.
 - Displays tree details, linked claim data, evidence photos, and raw debug data
   behind an explicit `Raw` button.
@@ -54,7 +56,13 @@ private RPC URLs, local `.env` files, raw customer exports, or any other secret.
 │   └── scripts/
 │       ├── smoke.mjs
 │       └── http-smoke.mjs
-└── embed-map/
+├── embed-map/
+│   ├── index.html
+│   ├── iframe.html
+│   ├── map.js
+│   ├── styles.css
+│   └── SilviMapFrame.tsx
+└── growfi-map/
     ├── index.html
     ├── iframe.html
     ├── map.js

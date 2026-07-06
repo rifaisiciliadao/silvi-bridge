@@ -4,7 +4,8 @@ Dependency-free Node.js API bridge for the Silvi public API.
 
 The backend keeps the Silvi API key server-side, forwards approved requests to
 Silvi, normalizes project data, and serves the static map assets from
-`../embed-map` at `/map/`.
+`../embed-map` at `/map/` by default. Requests with `Host: silvi.growfi.dev`
+serve the duplicated `../growfi-map` static app at the same `/map/` paths.
 
 ## Run Locally
 
