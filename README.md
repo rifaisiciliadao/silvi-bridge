@@ -31,6 +31,9 @@ private RPC URLs, local `.env` files, raw customer exports, or any other secret.
 - Supports direct single-project map links such as `/map/?project=29`.
 - Supports an iframe host at `/map/iframe.html`, including query-string
   propagation to the inner map.
+- Serves the same bridge at `https://silvi.rifaisicilia.com` and
+  `https://silvi.growfi.dev`; the GrowFi domain is an App Platform alias of the
+  Rifai primary domain.
 - Serves OpenGraph and favicon assets for social previews and browser tabs.
 - Displays tree details, linked claim data, evidence photos, and raw debug data
   behind an explicit `Raw` button.
@@ -101,6 +104,12 @@ Single-project map example:
 http://localhost:4317/map/?project=29
 ```
 
+Production single-project map example:
+
+```text
+https://silvi.growfi.dev/map/?project=28
+```
+
 Iframe host example:
 
 ```text
@@ -122,7 +131,7 @@ All configuration is read by `backend/src/config.mjs`.
 | `SILVI_AUTH_HEADER` | `Authorization` | No | Header name used when `SILVI_AUTH_MODE=header`. |
 | `SILVI_AUTH_SCHEME` | `Bearer` | No | Header prefix used when `SILVI_AUTH_MODE=header`. Set empty for raw key headers. |
 | `SILVI_ALLOWED_ORIGIN` | `*` | No | CORS origin for embed clients. |
-| `SILVI_REQUEST_TIMEOUT_MS` | `12000` | No | Upstream request timeout. |
+| `SILVI_REQUEST_TIMEOUT_MS` | `60000` | No | Upstream request timeout. |
 | `SILVI_INCLUDE_RAW` | `false` | No | Includes full upstream payloads in some responses for debugging. Do not enable by default on public deployments. |
 
 Silvi staging currently expects API-key authentication as `?key=...`. The
@@ -201,7 +210,7 @@ Single-project map:
 
 ```html
 <iframe
-  src="https://bridge.example.com/map/?project=29"
+  src="https://silvi.growfi.dev/map/?project=28"
   title="Oasi Maker live project map"
   style="width: 100%; height: 640px; border: 0"
 ></iframe>

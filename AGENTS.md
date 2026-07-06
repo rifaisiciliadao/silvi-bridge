@@ -153,12 +153,16 @@ App Platform app:
 - Region: `fra`
 - Service: single `backend` web service serving both API and `/map/` assets.
 - Size: `apps-s-1vcpu-0.5gb`, `instance_count: 1`.
-- Public domain: `https://silvi.rifaisicilia.com`
+- Primary public domain: `https://silvi.rifaisicilia.com`
+- GrowFi alias: `https://silvi.growfi.dev`
 - Default ingress: `https://silvi-bridge-prtzo.ondigitalocean.app`
 
-The custom domain is managed in DigitalOcean DNS under `rifaisicilia.com` with a
-`silvi` CNAME to the App Platform ingress. Do not commit or print deployed
-secret values; `SILVI_API_KEY` is configured as a DigitalOcean secret env var.
+The custom domains are managed in DigitalOcean DNS with `silvi` CNAME records
+under `rifaisicilia.com` and `growfi.dev`, both pointing to the App Platform
+ingress. `silvi.rifaisicilia.com` remains the primary App Platform domain;
+`silvi.growfi.dev` is an alias that serves the same map and API. Do not commit
+or print deployed secret values; `SILVI_API_KEY` is configured as a
+DigitalOcean secret env var.
 
 ## Test Commands
 

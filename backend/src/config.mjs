@@ -1,7 +1,7 @@
 const DEFAULT_BASE_URL = "https://admin.staging.silvi.earth/public-api";
 const DEFAULT_PROJECTS_PATH = "/projects/";
 const DEFAULT_PORT = 4317;
-const DEFAULT_TIMEOUT_MS = 12000;
+const DEFAULT_TIMEOUT_MS = 60000;
 
 export class SilviConfigError extends Error {
   constructor(message) {

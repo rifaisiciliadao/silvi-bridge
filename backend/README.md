@@ -79,7 +79,7 @@ Client query params are forwarded upstream except params prefixed with `_`.
 | `SILVI_AUTH_HEADER` | `Authorization` | Auth header name used only when `SILVI_AUTH_MODE=header`. |
 | `SILVI_AUTH_SCHEME` | `Bearer` | Prefix before the key for header auth. |
 | `SILVI_ALLOWED_ORIGIN` | `*` | CORS origin for embed clients. |
-| `SILVI_REQUEST_TIMEOUT_MS` | `12000` | Upstream timeout. |
+| `SILVI_REQUEST_TIMEOUT_MS` | `60000` | Upstream timeout. |
 | `SILVI_INCLUDE_RAW` | `false` | Include full upstream payloads for debugging. Keep disabled on public deployments. |
 
 ## GeoJSON
