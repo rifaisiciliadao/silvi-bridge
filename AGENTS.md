@@ -142,7 +142,9 @@ Single-project view:
 - Shows a centered loading overlay while data is loading.
 - The detail panel has icon-only raw/close controls and a sticky header. It
   remains a right-side panel in project embeds and only switches to full-width
-  on narrow mobile screens below 480px map width.
+  on narrow mobile screens below 480px map width. The sticky header must span
+  the full panel width, including the scrollbar gutter, so scrolled detail-list
+  borders never show through beside the close/raw controls.
 
 Cache behavior:
 

@@ -437,6 +437,8 @@ h1 {
 }
 
 .detail-panel {
+  --detail-panel-inline-padding: 16px;
+  --detail-scrollbar-cover: 18px;
   position: absolute;
   z-index: 1200;
   top: 16px;
@@ -446,8 +448,9 @@ h1 {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 0 16px 16px;
+  padding: 0 var(--detail-panel-inline-padding) 16px;
   overflow: auto;
+  scrollbar-gutter: stable;
   overscroll-behavior: contain;
   border-radius: 8px;
   background: color-mix(in srgb, var(--surface) 96%, transparent);
@@ -467,7 +470,8 @@ h1 {
   align-items: flex-start;
   justify-content: space-between;
   gap: 14px;
-  padding: 16px 0 12px;
+  margin-inline: calc(var(--detail-panel-inline-padding) * -1);
+  padding: 16px calc(var(--detail-panel-inline-padding) + var(--detail-scrollbar-cover)) 12px var(--detail-panel-inline-padding);
   border-bottom: 1px solid var(--line);
   background: color-mix(in srgb, var(--surface) 96%, transparent);
   backdrop-filter: blur(16px);
@@ -663,6 +667,7 @@ h1 {
 
 @media (max-width: 480px) {
   .detail-panel {
+    --detail-panel-inline-padding: 14px;
     top: 12px;
     right: 12px;
     bottom: auto;
@@ -670,7 +675,7 @@ h1 {
     width: auto;
     height: calc(100% - 24px);
     max-height: calc(100% - 24px);
-    padding: 0 14px 14px;
+    padding-bottom: 14px;
   }
 
   .detail-header h2 {
