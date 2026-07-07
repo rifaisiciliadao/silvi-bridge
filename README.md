@@ -285,7 +285,8 @@ counter and a small GeoJSON icon link. It hides the large project banner,
 project list, and technical project/zone/feature counters.
 
 The detail panel uses icon-only raw/close controls. Its header stays sticky
-while scrolling through claim, detail, photo, and raw-data sections.
+while scrolling through claim, detail, photo, and raw-data sections. It becomes
+a bottom sheet below 960px wide, keeping project embeds visually consistent.
 
 ## React Wrapper
 

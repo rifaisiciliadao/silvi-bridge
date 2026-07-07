@@ -656,6 +656,23 @@ h1 {
   color: #b42318;
 }
 
+@media (max-width: 960px) {
+  .detail-panel {
+    top: auto;
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    width: auto;
+    height: min(64%, 360px);
+    max-height: calc(100% - 24px);
+    padding: 0 14px 14px;
+  }
+
+  .detail-header h2 {
+    font-size: 20px;
+  }
+}
+
 @media (max-width: 680px) {
   .status-panel {
     top: auto;
@@ -681,21 +698,8 @@ h1 {
     padding: 8px;
   }
 
-  .detail-panel {
-    top: 12px;
-    right: 12px;
-    left: 12px;
-    width: auto;
-    height: 58%;
-    padding: 0 14px 14px;
-  }
-
   .map-shell.has-detail .status-panel {
     max-height: 30%;
-  }
-
-  .detail-header h2 {
-    font-size: 20px;
   }
 
   h1 {

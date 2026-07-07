@@ -140,7 +140,9 @@ Single-project view:
 - Hides project list and project/zone/feature counters.
 - Does not show an `All maps` button.
 - Shows a centered loading overlay while data is loading.
-- The detail panel has icon-only raw/close controls and a sticky header.
+- The detail panel has icon-only raw/close controls and a sticky header. Below
+  960px map width it renders as a bottom sheet; above 960px it renders as a
+  right-side panel.
 
 Cache behavior:
 
