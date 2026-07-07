@@ -27,6 +27,8 @@ private RPC URLs, local `.env` files, raw customer exports, or any other secret.
 - Builds map-ready GeoJSON for all projects at `/api/silvi/map.geojson`.
 - Builds project-scoped GeoJSON at
   `/api/silvi/projects/:projectId/map.geojson`.
+- Can refresh and serve map-ready JSON/GeoJSON from a DigitalOcean Spaces cache,
+  so public map embeds do not wait on live Silvi/STAC aggregation.
 - Redirects `/` to `/map/` so the public domain opens the visual map and social
   crawlers resolve the OpenGraph preview.
 - Serves a standalone live map at `/map/`.
@@ -37,8 +39,8 @@ private RPC URLs, local `.env` files, raw customer exports, or any other secret.
   `https://silvi.growfi.dev`, with host-specific static map apps and social
   assets.
 - Serves OpenGraph and favicon assets for social previews and browser tabs.
-- Displays tree details, linked claim data, evidence photos, and raw debug data
-  behind an explicit `Raw` button.
+- Displays tree details and linked claim data. Full raw upstream payloads are
+  only included when `SILVI_INCLUDE_RAW=true`.
 - Uses OpenStreetMap tiles by default and supports custom Leaflet tile URLs.
 - Ships smoke tests with a mock upstream, so tests do not require the real Silvi
   API key.
@@ -50,6 +52,8 @@ private RPC URLs, local `.env` files, raw customer exports, or any other secret.
 ├── backend/
 │   ├── package.json
 │   ├── src/
+│   │   ├── cache-manager.mjs
+│   │   ├── cache-store.mjs
 │   │   ├── config.mjs
 │   │   ├── server.mjs
 │   │   └── silvi-client.mjs
@@ -141,6 +145,18 @@ All configuration is read by `backend/src/config.mjs`.
 | `SILVI_ALLOWED_ORIGIN` | `*` | No | CORS origin for embed clients. |
 | `SILVI_REQUEST_TIMEOUT_MS` | `60000` | No | Upstream request timeout. |
 | `SILVI_INCLUDE_RAW` | `false` | No | Includes full upstream payloads in some responses for debugging. Do not enable by default on public deployments. |
+| `SILVI_CACHE_ENABLED` | `false` | No | Enables cache reads and scheduled cache refresh. |
+| `SILVI_CACHE_BACKEND` | `spaces` | No | Cache store. Use `spaces` in production or `memory` for tests. |
+| `SILVI_CACHE_REFRESH_ON_START` | `true` | No | Starts one refresh shortly after server boot. |
+| `SILVI_CACHE_REFRESH_INTERVAL_MS` | `300000` | No | Refresh cadence for cached JSON/GeoJSON. |
+| `SILVI_CACHE_PROJECT_CONCURRENCY` | `2` | No | Number of project maps refreshed in parallel. |
+| `SILVI_CACHE_REQUEST_TIMEOUT_MS` | `60000` | No | Timeout for Spaces cache requests. |
+| `SILVI_CACHE_SPACES_ENDPOINT` | `https://fra1.digitaloceanspaces.com` | Required for Spaces | DigitalOcean Spaces S3 endpoint. |
+| `SILVI_CACHE_SPACES_REGION` | `fra1` | Required for Spaces | Spaces region used for request signing. |
+| `SILVI_CACHE_SPACES_BUCKET` | empty | Required for Spaces | Bucket used for cached JSON/GeoJSON objects. |
+| `SILVI_CACHE_SPACES_PREFIX` | `silvi-cache` | No | Object prefix inside the bucket. |
+| `SILVI_CACHE_SPACES_ACCESS_KEY_ID` | empty | Required for Spaces | Spaces access key. Configure as a secret in production. |
+| `SILVI_CACHE_SPACES_SECRET_ACCESS_KEY` | empty | Required for Spaces | Spaces secret key. Configure as a secret in production. |
 
 Silvi staging currently expects API-key authentication as `?key=...`. The
 backend appends this upstream and never writes the key into map URLs.
@@ -151,6 +167,7 @@ Health and entrypoint:
 
 - `GET /` redirects to `/map/`
 - `GET /health`
+- `GET /api/silvi/cache/manifest`
 
 Raw and normalized API proxy endpoints:
 
@@ -201,6 +218,24 @@ property:
 `features.length` is a technical GeoJSON count. It includes project, zone, and
 tree geometries. The embedded map only exposes this technical count on the
 all-project view; single-project views show the tree count only.
+
+## Cache Model
+
+When `SILVI_CACHE_ENABLED=true`, the server starts a refresh job on boot and then
+repeats it every `SILVI_CACHE_REFRESH_INTERVAL_MS` milliseconds. The refresh
+builds and writes these JSON objects:
+
+- `projects.json`
+- `projects.geojson`
+- `map.geojson`
+- `projects/:projectId.json`
+- `projects/:projectId/map.geojson`
+- `projects/:projectId/zones.geojson`
+- `manifest.json`
+
+Public map endpoints first read these objects from the configured cache backend.
+If an object is missing, the endpoint falls back to the live Silvi API. Responses
+include `X-Silvi-Cache: HIT`, `MISS`, or `BYPASS`.
 
 ## Map Usage
 

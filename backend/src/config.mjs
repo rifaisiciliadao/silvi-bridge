@@ -2,6 +2,9 @@ const DEFAULT_BASE_URL = "https://admin.staging.silvi.earth/public-api";
 const DEFAULT_PROJECTS_PATH = "/projects/";
 const DEFAULT_PORT = 4317;
 const DEFAULT_TIMEOUT_MS = 60000;
+const DEFAULT_CACHE_REFRESH_INTERVAL_MS = 300000;
+const DEFAULT_CACHE_PROJECT_CONCURRENCY = 2;
+const DEFAULT_CACHE_SPACES_REGION = "fra1";
 
 export class SilviConfigError extends Error {
   constructor(message) {
@@ -24,7 +27,21 @@ export function getConfig(env = process.env) {
     authScheme: env.SILVI_AUTH_SCHEME === undefined ? "Bearer" : env.SILVI_AUTH_SCHEME,
     allowedOrigin: env.SILVI_ALLOWED_ORIGIN || "*",
     requestTimeoutMs: readInteger(env.SILVI_REQUEST_TIMEOUT_MS, DEFAULT_TIMEOUT_MS),
-    includeRaw: env.SILVI_INCLUDE_RAW === "true"
+    includeRaw: env.SILVI_INCLUDE_RAW === "true",
+    cacheEnabled: env.SILVI_CACHE_ENABLED === "true",
+    cacheBackend: env.SILVI_CACHE_BACKEND || "spaces",
+    cacheRefreshOnStart: env.SILVI_CACHE_REFRESH_ON_START !== "false",
+    cacheRefreshIntervalMs: readInteger(env.SILVI_CACHE_REFRESH_INTERVAL_MS, DEFAULT_CACHE_REFRESH_INTERVAL_MS),
+    cacheProjectConcurrency: readInteger(env.SILVI_CACHE_PROJECT_CONCURRENCY, DEFAULT_CACHE_PROJECT_CONCURRENCY),
+    cacheRequestTimeoutMs: readInteger(env.SILVI_CACHE_REQUEST_TIMEOUT_MS || env.SILVI_REQUEST_TIMEOUT_MS, DEFAULT_TIMEOUT_MS),
+    cacheSpacesEndpoint: trimTrailingSlash(
+      env.SILVI_CACHE_SPACES_ENDPOINT || `https://${env.SILVI_CACHE_SPACES_REGION || DEFAULT_CACHE_SPACES_REGION}.digitaloceanspaces.com`
+    ),
+    cacheSpacesRegion: env.SILVI_CACHE_SPACES_REGION || DEFAULT_CACHE_SPACES_REGION,
+    cacheSpacesBucket: env.SILVI_CACHE_SPACES_BUCKET || "",
+    cacheSpacesPrefix: trimSlashes(env.SILVI_CACHE_SPACES_PREFIX || "silvi-cache"),
+    cacheSpacesAccessKeyId: env.SILVI_CACHE_SPACES_ACCESS_KEY_ID || "",
+    cacheSpacesSecretAccessKey: env.SILVI_CACHE_SPACES_SECRET_ACCESS_KEY || ""
   };
 }
 
@@ -49,6 +66,10 @@ function readAuthMode(value) {
 
 function trimTrailingSlash(value) {
   return value.replace(/\/+$/, "");
+}
+
+function trimSlashes(value) {
+  return value.replace(/^\/+|\/+$/g, "");
 }
 
 function ensureLeadingSlash(value) {

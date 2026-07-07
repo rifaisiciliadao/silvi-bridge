@@ -2,6 +2,7 @@ import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { basename, extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createSilviCacheManager, SILVI_CACHE_KEYS } from "./cache-manager.mjs";
 import { getConfig } from "./config.mjs";
 import {
   readSilviGis,
@@ -15,6 +16,7 @@ import {
 } from "./silvi-client.mjs";
 
 const config = getConfig();
+const cacheManager = createSilviCacheManager({ config });
 const mapDirectory = fileURLToPath(new URL("../../embed-map/", import.meta.url));
 const growfiMapDirectory = fileURLToPath(new URL("../../growfi-map/", import.meta.url));
 const mapContentTypes = {
@@ -50,8 +52,13 @@ const server = createServer(async (request, response) => {
         ok: true,
         service: "silvi-bridge",
         upstreamBaseUrl: config.baseUrl,
-        projectsPath: config.projectsPath
+        projectsPath: config.projectsPath,
+        cache: cacheManager.status()
       });
+    }
+
+    if (url.pathname === "/api/silvi/cache/manifest" && request.method === "GET") {
+      return sendJson(response, 200, await cacheManager.manifest());
     }
 
     if (url.pathname === "/api/silvi/root" && request.method === "GET") {
@@ -63,24 +70,39 @@ const server = createServer(async (request, response) => {
     }
 
     if (url.pathname === "/api/silvi/projects" && request.method === "GET") {
-      const payload = await readSilviProjects({ config, searchParams: url.searchParams });
-      return sendJson(response, 200, payload);
+      const result = await readCachedOrFresh(url.searchParams, SILVI_CACHE_KEYS.projects, () => (
+        readSilviProjects({ config, searchParams: url.searchParams })
+      ));
+      return sendJson(response, 200, result.payload, cacheHeaders(result.cacheStatus));
     }
 
     if (url.pathname === "/api/silvi/projects.geojson" && request.method === "GET") {
-      const payload = await readSilviProjects({ config, searchParams: url.searchParams });
-      return sendJson(response, 200, payload.featureCollection);
+      const result = await readCachedOrFresh(url.searchParams, SILVI_CACHE_KEYS.projectsGeoJson, async () => {
+        const payload = await readSilviProjects({ config, searchParams: url.searchParams });
+        return payload.featureCollection;
+      });
+      return sendJson(response, 200, result.payload, cacheHeaders(result.cacheStatus));
     }
 
     if (url.pathname === "/api/silvi/map.geojson" && request.method === "GET") {
-      const payload = await readSilviMap({ config, searchParams: url.searchParams });
-      return sendJson(response, 200, payload.featureCollection);
+      const result = await readCachedOrFresh(url.searchParams, SILVI_CACHE_KEYS.mapGeoJson, async () => {
+        const payload = await readSilviMap({ config, searchParams: url.searchParams });
+        return payload.featureCollection;
+      });
+      return sendJson(response, 200, result.payload, cacheHeaders(result.cacheStatus));
     }
 
     const projectMapRoute = matchProjectMapRoute(url.pathname);
     if (projectMapRoute && request.method === "GET") {
-      const payload = await readSilviProjectMap(projectMapRoute.projectId, { config, searchParams: url.searchParams });
-      return sendJson(response, 200, payload.featureCollection);
+      const result = await readCachedOrFresh(
+        url.searchParams,
+        SILVI_CACHE_KEYS.projectMapGeoJson(projectMapRoute.projectId),
+        async () => {
+          const payload = await readSilviProjectMap(projectMapRoute.projectId, { config, searchParams: url.searchParams });
+          return payload.featureCollection;
+        }
+      );
+      return sendJson(response, 200, result.payload, cacheHeaders(result.cacheStatus));
     }
 
     const projectRoute = matchProjectRoute(url.pathname);
@@ -88,16 +110,23 @@ const server = createServer(async (request, response) => {
       const { projectId, resource, wantsGeoJson } = projectRoute;
 
       if (!resource) {
-        return sendJson(response, 200, await readSilviProject(projectId, { config, searchParams: url.searchParams }));
+        const result = await readCachedOrFresh(url.searchParams, SILVI_CACHE_KEYS.project(projectId), () => (
+          readSilviProject(projectId, { config, searchParams: url.searchParams })
+        ));
+        return sendJson(response, 200, result.payload, cacheHeaders(result.cacheStatus));
+      }
+
+      if (wantsGeoJson && resource === "zones") {
+        const result = await readCachedOrFresh(url.searchParams, SILVI_CACHE_KEYS.projectZonesGeoJson(projectId), async () => {
+          const project = await readSilviProject(projectId, { config });
+          const payload = await readSilviProjectResource(projectId, resource, { config, searchParams: url.searchParams });
+          const zones = Array.isArray(payload) ? payload : payload.zones || payload.results || payload.items || [];
+          return toMapFeatureCollection([project], [{ project, zones }]);
+        });
+        return sendJson(response, 200, result.payload, cacheHeaders(result.cacheStatus));
       }
 
       const payload = await readSilviProjectResource(projectId, resource, { config, searchParams: url.searchParams });
-      if (wantsGeoJson && resource === "zones") {
-        const project = await readSilviProject(projectId, { config });
-        const zones = Array.isArray(payload) ? payload : payload.zones || payload.results || payload.items || [];
-        return sendJson(response, 200, toMapFeatureCollection([project], [{ project, zones }]));
-      }
-
       return sendJson(response, 200, payload);
     }
 
@@ -126,6 +155,8 @@ const server = createServer(async (request, response) => {
     });
   }
 });
+
+cacheManager.start();
 
 server.listen(config.port, () => {
   console.log(`silvi-bridge listening on http://localhost:${config.port}`);
@@ -177,9 +208,33 @@ function mapAssetDirectory(request) {
   return host.startsWith("silvi.growfi.dev") ? growfiMapDirectory : mapDirectory;
 }
 
-function sendJson(response, statusCode, payload) {
+async function readCachedOrFresh(searchParams, key, freshReader) {
+  if (!cacheableSearchParams(searchParams)) {
+    return {
+      payload: await freshReader(),
+      cacheStatus: "BYPASS"
+    };
+  }
+
+  return cacheManager.readOrFresh(key, freshReader);
+}
+
+function cacheableSearchParams(searchParams) {
+  return [...searchParams.keys()].every((key) => key.startsWith("_"));
+}
+
+function cacheHeaders(cacheStatus) {
+  return {
+    "X-Silvi-Cache": cacheStatus
+  };
+}
+
+function sendJson(response, statusCode, payload, extraHeaders = {}) {
   applyHeaders(response, statusCode, "application/json; charset=utf-8");
-  response.end(JSON.stringify(payload, null, 2));
+  for (const [key, value] of Object.entries(extraHeaders)) {
+    response.setHeader(key, value);
+  }
+  response.end(JSON.stringify(payload));
 }
 
 function sendEmpty(response, statusCode) {

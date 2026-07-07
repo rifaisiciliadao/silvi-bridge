@@ -97,7 +97,8 @@ export async function readSilviProjectMap(projectId, options = {}) {
   const featureCollection = toMapFeatureCollection(
     [project],
     [{ project, zones }],
-    [{ project, trees }]
+    [{ project, trees }],
+    { includeRawData: config.includeRaw }
   );
 
   return {
@@ -317,7 +318,7 @@ export async function readSilviMap(options = {}) {
     );
   }
 
-  const featureCollection = toMapFeatureCollection(projects, zoneResults, treeResults);
+  const featureCollection = toMapFeatureCollection(projects, zoneResults, treeResults, { includeRawData: config.includeRaw });
 
   return {
     fetchedAt: projectsPayload.fetchedAt,
@@ -474,7 +475,7 @@ export function toFeatureCollection(projects) {
   };
 }
 
-export function toMapFeatureCollection(projects, zoneResults = [], treeResults = []) {
+export function toMapFeatureCollection(projects, zoneResults = [], treeResults = [], options = {}) {
   const zoneFeatures = [];
   const treeFeatures = [];
   const zoneByProjectId = new Map();
@@ -508,7 +509,7 @@ export function toMapFeatureCollection(projects, zoneResults = [], treeResults =
     }
 
     for (const tree of trees) {
-      const feature = toTreeFeature(tree, project, { projectId, projectName });
+      const feature = toTreeFeature(tree, project, { projectId, projectName }, options);
       if (feature) {
         treeFeatures.push(feature);
       }
@@ -589,7 +590,7 @@ function toZoneFeature(zone, project, context) {
   };
 }
 
-function toTreeFeature(tree, project, context) {
+function toTreeFeature(tree, project, context, options = {}) {
   const pointGeometry = normalizeGeoJsonGeometry(tree?.point || tree?.geometry || tree?.geojson);
   const coordinates = pointGeometry?.type === "Point" ? normalizeCoordinatePair(pointGeometry.coordinates) : findCoordinates(tree);
 
@@ -616,40 +617,45 @@ function toTreeFeature(tree, project, context) {
   const claim = tree?.claim || tree?.properties?.claim || null;
   const claimProperties = claim?.properties || claim || null;
 
+  const properties = {
+    kind: "tree",
+    id: treeId,
+    name: title || species || (treeId ? `Tree ${treeId}` : "Silvi tree"),
+    projectId: context.projectId,
+    projectName: context.projectName,
+    species,
+    scientificName,
+    health: firstValue(tree, ["properties.tree_health_display", "health", "health_status", "healthStatus", "status"]),
+    verified: firstValue(tree, ["properties.verified", "verified", "is_verified", "isVerified"]),
+    height,
+    heightUnit,
+    trunkDiameter: firstValue(tree, ["properties.trunk_diameter", "trunk_diameter", "trunkDiameter"]),
+    source,
+    claimId: firstValue(claimProperties, ["id"]),
+    claimType: firstValue(claimProperties, ["claim_type_display", "claim_type", "claimType"]),
+    claimAmount: firstValue(claimProperties, ["claim_amount", "claimAmount"]),
+    claimApproved: firstValue(claimProperties, ["claim_approved", "claimApproved"]),
+    claimTimestamp: firstValue(claimProperties, ["timestamp", "datetime"]),
+    claimNotes: firstValue(claimProperties, ["notes"]),
+    claimGoal: firstValue(claimProperties, ["goal"]),
+    claimCreator: firstValue(claimProperties, ["creator"]),
+    updatedAt: firstValue(tree, ["properties.datetime", "updatedAt", "updated_at", "lastUpdatedAt"])
+  };
+
+  if (options.includeRawData) {
+    properties.rawData = {
+      tree: compactStacFeature(tree),
+      claim: claim ? compactStacFeature(claim) : null
+    };
+  }
+
   return {
     type: "Feature",
     geometry: {
       type: "Point",
       coordinates
     },
-    properties: {
-      kind: "tree",
-      id: treeId,
-      name: title || species || (treeId ? `Tree ${treeId}` : "Silvi tree"),
-      projectId: context.projectId,
-      projectName: context.projectName,
-      species,
-      scientificName,
-      health: firstValue(tree, ["properties.tree_health_display", "health", "health_status", "healthStatus", "status"]),
-      verified: firstValue(tree, ["properties.verified", "verified", "is_verified", "isVerified"]),
-      height,
-      heightUnit,
-      trunkDiameter: firstValue(tree, ["properties.trunk_diameter", "trunk_diameter", "trunkDiameter"]),
-      source,
-      claimId: firstValue(claimProperties, ["id"]),
-      claimType: firstValue(claimProperties, ["claim_type_display", "claim_type", "claimType"]),
-      claimAmount: firstValue(claimProperties, ["claim_amount", "claimAmount"]),
-      claimApproved: firstValue(claimProperties, ["claim_approved", "claimApproved"]),
-      claimTimestamp: firstValue(claimProperties, ["timestamp", "datetime"]),
-      claimNotes: firstValue(claimProperties, ["notes"]),
-      claimGoal: firstValue(claimProperties, ["goal"]),
-      claimCreator: firstValue(claimProperties, ["creator"]),
-      rawData: {
-        tree: compactStacFeature(tree),
-        claim: claim ? compactStacFeature(claim) : null
-      },
-      updatedAt: firstValue(tree, ["properties.datetime", "updatedAt", "updated_at", "lastUpdatedAt"])
-    }
+    properties
   };
 }
 

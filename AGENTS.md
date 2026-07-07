@@ -35,6 +35,11 @@ Silvi client and normalization:
 
 - `backend/src/silvi-client.mjs`
 
+Cache manager and store:
+
+- `backend/src/cache-manager.mjs`
+- `backend/src/cache-store.mjs`
+
 Configuration:
 
 - `backend/src/config.mjs`
@@ -56,6 +61,7 @@ Health and entrypoint:
 
 - `GET /` redirects to `/map/`.
 - `GET /health`
+- `GET /api/silvi/cache/manifest`
 
 Silvi proxy endpoints:
 
@@ -109,8 +115,8 @@ Feature `properties.kind` values:
 - `project`: project point.
 - `zone`: project zone geometry.
 - `tree`: tree point with species, health, verification, height, project
-  metadata, linked claim fields, compact raw tree/claim payload, and photo
-  assets when available.
+  metadata, and linked claim fields. Compact raw tree/claim payloads are only
+  included when `SILVI_INCLUDE_RAW=true`.
 
 `features.length` is a technical renderable geometry count, not a tree count.
 The single-project UI hides this count and shows only the tree counter.
@@ -132,6 +138,19 @@ Single-project view:
 - Hides project list and project/zone/feature counters.
 - Does not show an `All maps` button.
 - Shows a centered loading overlay while data is loading.
+
+Cache behavior:
+
+- `SILVI_CACHE_ENABLED=true` enables cached public map responses.
+- The production backend uses DigitalOcean Spaces through
+  `SILVI_CACHE_BACKEND=spaces`.
+- `SILVI_CACHE_REFRESH_INTERVAL_MS` defaults to `300000` milliseconds.
+- Cache refresh writes `projects.json`, `projects.geojson`, `map.geojson`,
+  per-project `projects/:projectId.json`,
+  `projects/:projectId/map.geojson`, `projects/:projectId/zones.geojson`, and
+  `manifest.json`.
+- GeoJSON and project endpoints return `X-Silvi-Cache: HIT`, `MISS`, or
+  `BYPASS`.
 
 Iframe host:
 
@@ -165,8 +184,8 @@ under `rifaisicilia.com` and `growfi.dev`, both pointing to the App Platform
 ingress. `silvi.rifaisicilia.com` remains the primary App Platform domain;
 `silvi.growfi.dev` is an alias for the same backend/API but serves the separate
 `growfi-map/` static app. Do not commit or print deployed secret values;
-`SILVI_API_KEY` is configured as a
-DigitalOcean secret env var.
+`SILVI_API_KEY` and DigitalOcean Spaces keys are configured as DigitalOcean
+secret env vars.
 
 ## Test Commands
 

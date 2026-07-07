@@ -187,7 +187,11 @@ const child = spawn(process.execPath, ["src/server.mjs"], {
     SILVI_API_BASE_URL: `http://127.0.0.1:${upstreamPort}`,
     SILVI_PROJECTS_PATH: "/projects/",
     SILVI_AUTH_MODE: "query",
-    SILVI_AUTH_QUERY_PARAM: "key"
+    SILVI_AUTH_QUERY_PARAM: "key",
+    SILVI_CACHE_ENABLED: "true",
+    SILVI_CACHE_BACKEND: "memory",
+    SILVI_CACHE_REFRESH_INTERVAL_MS: "600000",
+    SILVI_CACHE_REFRESH_ON_START: "true"
   },
   stdio: ["ignore", "pipe", "pipe"]
 });
@@ -197,12 +201,20 @@ try {
 
   const health = await readJson(`http://127.0.0.1:${bridgePort}/health`);
   assert.equal(health.ok, true);
+  assert.equal(health.cache.enabled, true);
+
+  const manifest = await waitForCache(bridgePort);
+  assert.equal(manifest.enabled, true);
+  assert.equal(manifest.manifest.cachedProjectCount, 1);
+  assert.equal(manifest.manifest.featureCount, 3);
 
   const rootRedirect = await readResponse(`http://127.0.0.1:${bridgePort}/`, { redirect: "manual" });
   assert.equal(rootRedirect.status, 308);
   assert.equal(rootRedirect.headers.get("location"), "/map/");
 
-  const projects = await readJson(`http://127.0.0.1:${bridgePort}/api/silvi/projects`);
+  const projectsResponse = await readResponse(`http://127.0.0.1:${bridgePort}/api/silvi/projects`);
+  assert.equal(projectsResponse.headers.get("x-silvi-cache"), "HIT");
+  const projects = await projectsResponse.json();
   assert.equal(projects.count, 1);
   assert.equal(projects.mappedCount, 1);
 
@@ -221,11 +233,15 @@ try {
   const trees = await readJson(`http://127.0.0.1:${bridgePort}/api/silvi/projects/29/trees`);
   assert.equal(trees.trees.length, 0);
 
-  const geojson = await readJson(`http://127.0.0.1:${bridgePort}/api/silvi/projects.geojson`);
+  const geojsonResponse = await readResponse(`http://127.0.0.1:${bridgePort}/api/silvi/projects.geojson`);
+  assert.equal(geojsonResponse.headers.get("x-silvi-cache"), "HIT");
+  const geojson = await geojsonResponse.json();
   assert.equal(geojson.type, "FeatureCollection");
   assert.equal(geojson.features.length, 1);
 
-  const mapGeojson = await readJson(`http://127.0.0.1:${bridgePort}/api/silvi/map.geojson`);
+  const mapGeojsonResponse = await readResponse(`http://127.0.0.1:${bridgePort}/api/silvi/map.geojson`);
+  assert.equal(mapGeojsonResponse.headers.get("x-silvi-cache"), "HIT");
+  const mapGeojson = await mapGeojsonResponse.json();
   assert.equal(mapGeojson.type, "FeatureCollection");
   assert.equal(mapGeojson.features.length, 3);
   assert.equal(mapGeojson.features[0].geometry.type, "Polygon");
@@ -239,12 +255,16 @@ try {
     [0, 0]
   );
 
-  const projectMapGeojson = await readJson(`http://127.0.0.1:${bridgePort}/api/silvi/projects/29/map.geojson`);
+  const projectMapGeojsonResponse = await readResponse(`http://127.0.0.1:${bridgePort}/api/silvi/projects/29/map.geojson`);
+  assert.equal(projectMapGeojsonResponse.headers.get("x-silvi-cache"), "HIT");
+  const projectMapGeojson = await projectMapGeojsonResponse.json();
   assert.equal(projectMapGeojson.type, "FeatureCollection");
   assert.equal(projectMapGeojson.features.length, 3);
   assert.equal(projectMapGeojson.features.find((feature) => feature.properties.kind === "tree").properties.projectId, 29);
 
-  const zonesGeojson = await readJson(`http://127.0.0.1:${bridgePort}/api/silvi/projects/29/zones.geojson`);
+  const zonesGeojsonResponse = await readResponse(`http://127.0.0.1:${bridgePort}/api/silvi/projects/29/zones.geojson`);
+  assert.equal(zonesGeojsonResponse.headers.get("x-silvi-cache"), "HIT");
+  const zonesGeojson = await zonesGeojsonResponse.json();
   assert.equal(zonesGeojson.features[0].properties.projectId, 29);
 
   const mapHtml = await readText(`http://127.0.0.1:${bridgePort}/map/`);
@@ -327,6 +347,20 @@ async function waitForServer(port) {
   }
 
   throw new Error("Bridge server did not start");
+}
+
+async function waitForCache(port) {
+  const deadline = Date.now() + 5000;
+
+  while (Date.now() < deadline) {
+    const payload = await readJson(`http://127.0.0.1:${port}/api/silvi/cache/manifest`);
+    if (payload.manifest?.refreshedAt) {
+      return payload;
+    }
+    await delay(100);
+  }
+
+  throw new Error("Bridge cache did not refresh");
 }
 
 async function readJson(url, init) {
