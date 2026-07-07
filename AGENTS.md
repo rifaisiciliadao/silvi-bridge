@@ -144,6 +144,9 @@ Cache behavior:
 - `SILVI_CACHE_ENABLED=true` enables cached public map responses.
 - The production backend uses DigitalOcean Spaces through
   `SILVI_CACHE_BACKEND=spaces`.
+- Production cache objects are stored in the `growfi-media` DigitalOcean Spaces
+  bucket under the `silvi-cache/` prefix, using a bucket-scoped read/write key
+  configured only on the `silvi-bridge` App Platform service.
 - `SILVI_CACHE_REFRESH_INTERVAL_MS` defaults to `300000` milliseconds.
 - Cache refresh writes `projects.json`, `projects.geojson`, `map.geojson`,
   per-project `projects/:projectId.json`,
