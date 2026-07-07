@@ -40,7 +40,6 @@ const elements = {
   detailSubtitle: document.getElementById("detailSubtitle"),
   detailTitle: document.getElementById("detailTitle"),
   featureCount: document.getElementById("featureCount"),
-  fitButton: document.getElementById("fitButton"),
   mapLoader: document.getElementById("mapLoader"),
   mapLoaderText: document.getElementById("mapLoaderText"),
   mapShell: document.querySelector(".map-shell"),
@@ -117,9 +116,6 @@ function renderFeatureCollection(featureCollection) {
   fullFeatureCollection = featureCollection;
   renderCurrentView({ fit: true });
 
-  elements.fitButton.addEventListener("click", () => {
-    fitVisibleMap();
-  });
   elements.detailCloseButton.addEventListener("click", closeDetailPanel);
   elements.detailRawButton.addEventListener("click", toggleRawDetails);
   hideLoader();

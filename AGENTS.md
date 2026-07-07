@@ -134,7 +134,8 @@ Single-project view:
 
 - `/map/?project=:projectId`
 - Loads `/api/silvi/projects/:projectId/map.geojson`.
-- Shows project name and tree count only.
+- Shows a compact tree count and an icon-only GeoJSON link.
+- Hides the large project banner.
 - Hides project list and project/zone/feature counters.
 - Does not show an `All maps` button.
 - Shows a centered loading overlay while data is loading.

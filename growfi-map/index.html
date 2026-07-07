@@ -87,8 +87,15 @@
         </dl>
 
         <div class="panel-actions">
-          <button id="fitButton" type="button">Fit map</button>
-          <a id="apiLink" href="/api/silvi/map.geojson" target="_blank" rel="noreferrer">GeoJSON</a>
+          <a id="apiLink" class="geojson-link" href="/api/silvi/map.geojson" target="_blank" rel="noreferrer" aria-label="Open GeoJSON" title="Open GeoJSON">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7l-5-5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+              <path d="M14 2v5h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+              <path d="m10 13-2 2 2 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="m14 13 2 2-2 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <span class="visually-hidden">Open GeoJSON</span>
+          </a>
         </div>
 
         <div id="projectList" class="project-list" aria-label="Silvi projects"></div>

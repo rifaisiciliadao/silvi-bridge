@@ -274,9 +274,9 @@ Supported map query parameters:
 | `tiles` | Leaflet tile URL template. Defaults to OpenStreetMap. |
 | `tileAttribution` | Attribution HTML for the selected tile provider. |
 
-The single-project view is intentionally minimal: project name, tree counter,
-fit button, and a GeoJSON link. It hides the project list and technical
-project/zone/feature counters.
+The single-project view is intentionally minimal: it shows a compact tree
+counter and a small GeoJSON icon link. It hides the large project banner,
+project list, and technical project/zone/feature counters.
 
 ## React Wrapper
 

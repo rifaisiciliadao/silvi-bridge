@@ -50,10 +50,8 @@ The all-project view shows:
 The single-project view intentionally hides the project list and technical
 project/zone/feature counters. It shows:
 
-- the project name;
-- tree count;
-- `Fit map`;
-- `GeoJSON`;
+- a compact tree count;
+- an icon-only `GeoJSON` link;
 - a clear loading overlay while data is loading.
 
 Tree points are clickable. Clicking a tree opens a side detail panel with
