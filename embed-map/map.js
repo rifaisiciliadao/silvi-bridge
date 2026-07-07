@@ -381,6 +381,7 @@ function renderFeatureDetails(feature) {
   elements.rawSection.hidden = true;
   elements.detailRawButton.setAttribute("aria-expanded", "false");
   elements.detailPanel.hidden = false;
+  elements.detailPanel.scrollTop = 0;
   elements.mapShell.classList.add("has-detail");
 }
 
@@ -510,7 +511,16 @@ function rawDetailsForFeature(feature) {
 
 function extractMediaAssets(properties) {
   const rawData = properties.rawData || {};
+  const explicitAssets = Array.isArray(properties.mediaAssets)
+    ? properties.mediaAssets.map((asset) => ({
+        href: asset.href || asset.url,
+        title: asset.title,
+        source: asset.source || "Evidence",
+        type: asset.type || "image/*"
+      }))
+    : [];
   const sources = [
+    ["Evidence", explicitAssets],
     ["Tree", rawData.tree?.assets],
     ["Claim", rawData.claim?.assets]
   ];
@@ -518,7 +528,7 @@ function extractMediaAssets(properties) {
   const media = [];
 
   for (const [source, assets] of sources) {
-    if (!assets || typeof assets !== "object") {
+    if (!assets || (typeof assets !== "object" && !Array.isArray(assets))) {
       continue;
     }
 

@@ -13,6 +13,8 @@ const PROJECT_RESOURCE_PATHS = {
 
 const MAX_STAC_PAGES = 100;
 const STAC_PAGE_CONCURRENCY = 6;
+const IMAGE_TREE_MATCH_RADIUS_METERS = 20;
+const MAX_MEDIA_ASSETS_PER_TREE = 4;
 
 export class SilviUpstreamError extends Error {
   constructor(message, options = {}) {
@@ -81,10 +83,11 @@ export async function readSilviProjectMap(projectId, options = {}) {
   requireApiKey(config);
   assertProjectId(projectId);
 
-  const [projectResult, zonesResult, treesResult] = await Promise.allSettled([
+  const [projectResult, zonesResult, treesResult, imagesResult] = await Promise.allSettled([
     readSilviProject(projectId, { config, searchParams: options.searchParams }),
     readSilviProjectResource(projectId, "zones", { config, searchParams: options.searchParams }),
-    readSilviProjectTrees(projectId, { config })
+    readSilviProjectTrees(projectId, { config }),
+    readSilviProjectResourceCollection(projectId, "images", { config })
   ]);
 
   if (projectResult.status === "rejected") {
@@ -94,10 +97,11 @@ export async function readSilviProjectMap(projectId, options = {}) {
   const project = projectResult.value;
   const zones = zonesResult.status === "fulfilled" ? extractCollection(zonesResult.value?.zones || zonesResult.value) : [];
   const trees = treesResult.status === "fulfilled" ? treesResult.value : [];
+  const images = imagesResult.status === "fulfilled" ? imagesResult.value : [];
   const featureCollection = toMapFeatureCollection(
     [project],
     [{ project, zones }],
-    [{ project, trees }],
+    [{ project, trees, images }],
     { includeRawData: config.includeRaw }
   );
 
@@ -304,16 +308,22 @@ export async function readSilviMap(options = {}) {
       projects.map(async (project) => {
         const projectId = firstValue(project, ["id", "project_id", "projectId"]);
         const embeddedTrees = extractCollection(project?.trees);
+        const imagesPromise = projectId
+          ? readSilviProjectResourceCollection(projectId, "images", { config })
+          : Promise.resolve([]);
         if (embeddedTrees.length > 0 || !projectId) {
-          return { project, trees: embeddedTrees };
+          const imagesResult = await imagesPromise.catch(() => []);
+          return { project, trees: embeddedTrees, images: imagesResult };
         }
 
-        try {
-          const trees = await readSilviProjectTrees(projectId, { config });
-          return { project, trees };
-        } catch (error) {
-          return { project, trees: [], error };
-        }
+        const [treesResult, imagesResult] = await Promise.allSettled([
+          readSilviProjectTrees(projectId, { config }),
+          imagesPromise
+        ]);
+        const images = imagesResult.status === "fulfilled" ? imagesResult.value : [];
+        return treesResult.status === "fulfilled"
+          ? { project, trees: treesResult.value, images }
+          : { project, trees: [], images, error: treesResult.reason };
       })
     );
   }
@@ -480,6 +490,7 @@ export function toMapFeatureCollection(projects, zoneResults = [], treeResults =
   const treeFeatures = [];
   const zoneByProjectId = new Map();
   const treesByProjectId = new Map();
+  const imagesByProjectId = new Map();
 
   for (const result of zoneResults) {
     const projectId = firstValue(result.project, ["id", "project_id", "projectId"]);
@@ -492,6 +503,7 @@ export function toMapFeatureCollection(projects, zoneResults = [], treeResults =
     const projectId = firstValue(result.project, ["id", "project_id", "projectId"]);
     if (projectId !== null) {
       treesByProjectId.set(String(projectId), result.trees || []);
+      imagesByProjectId.set(String(projectId), result.images || []);
     }
   }
 
@@ -500,6 +512,8 @@ export function toMapFeatureCollection(projects, zoneResults = [], treeResults =
     const projectName = firstValue(project, ["name", "title", "displayName", "projectName"]);
     const zones = zoneByProjectId.get(String(projectId)) || extractCollection(project?.zones);
     const trees = treesByProjectId.get(String(projectId)) || extractCollection(project?.trees);
+    const images = imagesByProjectId.get(String(projectId)) || extractCollection(project?.images);
+    const mediaAssetsByTreeKey = matchImagesToTrees(trees, images);
 
     for (const zone of zones) {
       const feature = toZoneFeature(zone, project, { projectId, projectName });
@@ -509,7 +523,10 @@ export function toMapFeatureCollection(projects, zoneResults = [], treeResults =
     }
 
     for (const tree of trees) {
-      const feature = toTreeFeature(tree, project, { projectId, projectName }, options);
+      const feature = toTreeFeature(tree, project, { projectId, projectName }, {
+        ...options,
+        mediaAssets: mediaAssetsByTreeKey.get(treeIdentity(tree)) || []
+      });
       if (feature) {
         treeFeatures.push(feature);
       }
@@ -642,6 +659,15 @@ function toTreeFeature(tree, project, context, options = {}) {
     updatedAt: firstValue(tree, ["properties.datetime", "updatedAt", "updated_at", "lastUpdatedAt"])
   };
 
+  const mediaAssets = compactMediaAssets([
+    ...extractStacMediaAssets(tree, "Tree"),
+    ...(claim ? extractStacMediaAssets(claim, "Claim") : []),
+    ...(Array.isArray(options.mediaAssets) ? options.mediaAssets : [])
+  ]);
+  if (mediaAssets.length > 0) {
+    properties.mediaAssets = mediaAssets;
+  }
+
   if (options.includeRawData) {
     properties.rawData = {
       tree: compactStacFeature(tree),
@@ -691,6 +717,141 @@ function toProjectFeatureFromZones(project, zones) {
       updatedAt: firstValue(project, ["updatedAt", "updated_at", "lastUpdatedAt"])
     }
   };
+}
+
+function matchImagesToTrees(trees, images) {
+  const matches = new Map();
+  const candidates = trees
+    .map((tree) => ({
+      key: treeIdentity(tree),
+      coordinates: findCoordinates(tree)
+    }))
+    .filter((candidate) => candidate.key && candidate.coordinates);
+
+  if (candidates.length === 0) {
+    return matches;
+  }
+
+  for (const image of images || []) {
+    const imageCoordinates = findCoordinates(image);
+    if (!imageCoordinates) {
+      continue;
+    }
+
+    let closest = null;
+    for (const candidate of candidates) {
+      const distance = distanceMeters(imageCoordinates, candidate.coordinates);
+      if (!closest || distance < closest.distance) {
+        closest = { ...candidate, distance };
+      }
+    }
+
+    if (!closest || closest.distance > IMAGE_TREE_MATCH_RADIUS_METERS) {
+      continue;
+    }
+
+    const mediaAsset = toProjectImageMediaAsset(image, closest.distance);
+    if (!mediaAsset) {
+      continue;
+    }
+
+    const existing = matches.get(closest.key) || [];
+    existing.push(mediaAsset);
+    existing.sort((a, b) => (a.distanceMeters || 0) - (b.distanceMeters || 0));
+    matches.set(closest.key, existing.slice(0, MAX_MEDIA_ASSETS_PER_TREE));
+  }
+
+  return matches;
+}
+
+function toProjectImageMediaAsset(image, distance) {
+  const href = firstValue(image, ["image_url", "imageUrl", "url", "href", "asset.href"]);
+  if (!href) {
+    return null;
+  }
+
+  const id = firstValue(image, ["id", "uuid"]);
+  return {
+    href,
+    title: firstValue(image, ["title", "name", "caption"]) || (id ? `Evidence photo ${id}` : "Evidence photo"),
+    source: "Project image",
+    type: firstValue(image, ["type", "mime_type", "mimeType"]) || "image/*",
+    timestamp: firstValue(image, ["timestamp", "datetime", "createdAt", "created_at"]),
+    distanceMeters: Math.round(distance * 10) / 10
+  };
+}
+
+function extractStacMediaAssets(feature, source) {
+  if (!feature?.assets || typeof feature.assets !== "object") {
+    return [];
+  }
+
+  return Object.values(feature.assets)
+    .map((asset) => {
+      const href = asset?.href;
+      if (!href) {
+        return null;
+      }
+
+      const type = String(asset.type || "");
+      const roles = Array.isArray(asset.roles) ? asset.roles.join(" ") : "";
+      if (!type.startsWith("image/") && !roles.includes("thumbnail")) {
+        return null;
+      }
+
+      return {
+        href,
+        title: asset.title || `${source} evidence photo`,
+        source,
+        type: asset.type || "image/*"
+      };
+    })
+    .filter(Boolean);
+}
+
+function compactMediaAssets(assets) {
+  const seen = new Set();
+  const compact = [];
+
+  for (const asset of assets) {
+    const href = asset?.href || asset?.url;
+    if (!href || seen.has(href)) {
+      continue;
+    }
+
+    seen.add(href);
+    compact.push({
+      href,
+      title: asset.title || asset.source || "Evidence photo",
+      source: asset.source || "Evidence",
+      type: asset.type || "image/*",
+      timestamp: asset.timestamp || null,
+      distanceMeters: asset.distanceMeters ?? null
+    });
+  }
+
+  return compact.slice(0, MAX_MEDIA_ASSETS_PER_TREE);
+}
+
+function distanceMeters(first, second) {
+  const lon1 = Number(first[0]);
+  const lat1 = Number(first[1]);
+  const lon2 = Number(second[0]);
+  const lat2 = Number(second[1]);
+
+  if (!isValidLonLat(lon1, lat1) || !isValidLonLat(lon2, lat2)) {
+    return Number.POSITIVE_INFINITY;
+  }
+
+  const toRadians = (degrees) => degrees * Math.PI / 180;
+  const radiusMeters = 6371000;
+  const deltaLat = toRadians(lat2 - lat1);
+  const deltaLon = toRadians(lon2 - lon1);
+  const startLat = toRadians(lat1);
+  const endLat = toRadians(lat2);
+  const a = Math.sin(deltaLat / 2) ** 2
+    + Math.cos(startLat) * Math.cos(endLat) * Math.sin(deltaLon / 2) ** 2;
+  return 2 * radiusMeters * Math.asin(Math.sqrt(a));
 }
 
 function findCoordinates(value) {

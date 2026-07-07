@@ -32,11 +32,11 @@ body,
 .map-canvas {
   width: 100%;
   height: 100%;
-  min-height: 480px;
 }
 
 body {
   margin: 0;
+  overflow: hidden;
   color: var(--text);
   background: var(--surface-soft);
   font-family: var(--font-sans);
@@ -446,7 +446,7 @@ h1 {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 16px;
+  padding: 0 16px 16px;
   overflow: auto;
   overscroll-behavior: contain;
   border-radius: 8px;
@@ -460,12 +460,17 @@ h1 {
 }
 
 .detail-header {
+  position: sticky;
+  z-index: 2;
+  top: 0;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 14px;
-  padding-bottom: 12px;
+  padding: 16px 0 12px;
   border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 96%, transparent);
+  backdrop-filter: blur(16px);
 }
 
 .detail-header h2 {
@@ -492,16 +497,16 @@ h1 {
 
 .detail-header-button {
   flex: 0 0 auto;
-  min-height: 32px;
-  padding: 0 10px;
+  width: 34px;
+  height: 34px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
   border: 0;
-  border-radius: 6px;
+  border-radius: 999px;
   color: var(--text);
   background: var(--surface-soft);
   box-shadow: 0 0 0 1px var(--line);
-  font-size: 12px;
-  font-family: var(--font-accent);
-  font-weight: 700;
   cursor: pointer;
 }
 
@@ -514,6 +519,12 @@ h1 {
 .detail-header-button:focus-visible {
   outline: 2px solid var(--blue);
   outline-offset: 2px;
+}
+
+.detail-header-button svg {
+  width: 17px;
+  height: 17px;
+  display: block;
 }
 
 .detail-section {
@@ -646,13 +657,6 @@ h1 {
 }
 
 @media (max-width: 680px) {
-  html,
-  body,
-  .map-shell,
-  .map-canvas {
-    min-height: 620px;
-  }
-
   .status-panel {
     top: auto;
     right: 12px;
@@ -683,7 +687,7 @@ h1 {
     left: 12px;
     width: auto;
     height: 58%;
-    padding: 14px;
+    padding: 0 14px 14px;
   }
 
   .map-shell.has-detail .status-panel {

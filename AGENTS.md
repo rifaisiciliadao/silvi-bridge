@@ -115,8 +115,9 @@ Feature `properties.kind` values:
 - `project`: project point.
 - `zone`: project zone geometry.
 - `tree`: tree point with species, health, verification, height, project
-  metadata, and linked claim fields. Compact raw tree/claim payloads are only
-  included when `SILVI_INCLUDE_RAW=true`.
+  metadata, linked claim fields, and optional compact `mediaAssets` derived from
+  nearby project images. Compact raw tree/claim payloads are only included when
+  `SILVI_INCLUDE_RAW=true`.
 
 `features.length` is a technical renderable geometry count, not a tree count.
 The single-project UI hides this count and shows only the tree counter.
@@ -139,6 +140,7 @@ Single-project view:
 - Hides project list and project/zone/feature counters.
 - Does not show an `All maps` button.
 - Shows a centered loading overlay while data is loading.
+- The detail panel has icon-only raw/close controls and a sticky header.
 
 Cache behavior:
 
@@ -153,6 +155,8 @@ Cache behavior:
   per-project `projects/:projectId.json`,
   `projects/:projectId/map.geojson`, `projects/:projectId/zones.geojson`, and
   `manifest.json`.
+- Project map cache refresh reads `/images` and stores compact image references
+  in tree `mediaAssets` when images fall within 20 meters of a tree point.
 - GeoJSON and project endpoints return `X-Silvi-Cache: HIT`, `MISS`, or
   `BYPASS`.
 

@@ -84,6 +84,16 @@ const mockStacClaims = [
   }
 ];
 
+const mockImages = [
+  {
+    id: 501,
+    image_url: "https://example.com/evidence/tree-http-smoke.jpg",
+    timestamp: "2026-07-01T08:41:00.000Z",
+    latitude: 37.25001,
+    longitude: 14.25001
+  }
+];
+
 const upstream = createServer((request, response) => {
   const url = new URL(request.url, "http://localhost");
   response.setHeader("Content-Type", "application/json");
@@ -152,6 +162,16 @@ const upstream = createServer((request, response) => {
       page_size: 1000,
       num_pages: 1,
       trees: []
+    }));
+  }
+
+  if (url.pathname === "/projects/29/images/") {
+    return response.end(JSON.stringify({
+      count: mockImages.length,
+      page: 1,
+      page_size: 1000,
+      num_pages: 1,
+      images: mockImages
     }));
   }
 
@@ -250,6 +270,11 @@ try {
   assert.equal(mapGeojson.features.find((feature) => feature.properties.kind === "tree").properties.source, "stac");
   assert.equal(mapGeojson.features.find((feature) => feature.properties.kind === "tree").properties.claimType, "Proof of Planting");
   assert.equal(mapGeojson.features.find((feature) => feature.properties.kind === "tree").properties.claimAmount, "1.20000");
+  assert.equal(mapGeojson.features.find((feature) => feature.properties.kind === "tree").properties.mediaAssets.length, 1);
+  assert.equal(
+    mapGeojson.features.find((feature) => feature.properties.kind === "tree").properties.mediaAssets[0].href,
+    "https://example.com/evidence/tree-http-smoke.jpg"
+  );
   assert.notDeepEqual(
     mapGeojson.features.find((feature) => feature.properties.kind === "project").geometry.coordinates,
     [0, 0]
@@ -261,6 +286,7 @@ try {
   assert.equal(projectMapGeojson.type, "FeatureCollection");
   assert.equal(projectMapGeojson.features.length, 3);
   assert.equal(projectMapGeojson.features.find((feature) => feature.properties.kind === "tree").properties.projectId, 29);
+  assert.equal(projectMapGeojson.features.find((feature) => feature.properties.kind === "tree").properties.mediaAssets.length, 1);
 
   const zonesGeojsonResponse = await readResponse(`http://127.0.0.1:${bridgePort}/api/silvi/projects/29/zones.geojson`);
   assert.equal(zonesGeojsonResponse.headers.get("x-silvi-cache"), "HIT");

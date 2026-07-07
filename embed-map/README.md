@@ -56,7 +56,8 @@ project/zone/feature counters. It shows:
 
 Tree points are clickable. Clicking a tree opens a side detail panel with
 species, health, verification, linked claim fields, evidence photos, and compact
-raw data behind a `Raw` button.
+raw data behind an icon-only raw toggle. The detail header stays sticky while
+the panel scrolls.
 
 ## Iframe Usage
 

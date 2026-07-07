@@ -39,8 +39,9 @@ private RPC URLs, local `.env` files, raw customer exports, or any other secret.
   `https://silvi.growfi.dev`, with host-specific static map apps and social
   assets.
 - Serves OpenGraph and favicon assets for social previews and browser tabs.
-- Displays tree details and linked claim data. Full raw upstream payloads are
-  only included when `SILVI_INCLUDE_RAW=true`.
+- Displays tree details, linked claim data, and compact image evidence linked
+  from project photos. Full raw upstream payloads are only included when
+  `SILVI_INCLUDE_RAW=true`.
 - Uses OpenStreetMap tiles by default and supports custom Leaflet tile URLs.
 - Ships smoke tests with a mock upstream, so tests do not require the real Silvi
   API key.
@@ -213,11 +214,16 @@ property:
   coordinates, the backend derives a point from zone geometry.
 - `kind: "zone"`: project zone polygon or line geometry.
 - `kind: "tree"`: tree point with species, health, verification, height,
-  project metadata, and linked claim fields when available.
+  project metadata, linked claim fields when available, and optional
+  `mediaAssets` for nearby project image evidence.
 
 `features.length` is a technical GeoJSON count. It includes project, zone, and
 tree geometries. The embedded map only exposes this technical count on the
 all-project view; single-project views show the tree count only.
+
+When project images include coordinates, tree features can include a compact
+`properties.mediaAssets` array. Images are associated with the nearest tree
+within 20 meters and are shown in the detail panel.
 
 ## Cache Model
 
@@ -277,6 +283,9 @@ Supported map query parameters:
 The single-project view is intentionally minimal: it shows a compact tree
 counter and a small GeoJSON icon link. It hides the large project banner,
 project list, and technical project/zone/feature counters.
+
+The detail panel uses icon-only raw/close controls. Its header stays sticky
+while scrolling through claim, detail, photo, and raw-data sections.
 
 ## React Wrapper
 
